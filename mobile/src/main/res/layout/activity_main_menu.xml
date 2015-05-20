@@ -1,0 +1,80 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MyActivity"
+    android:id="@+id/main_layout">
+
+
+    <EditText
+        android:id="@+id/text"
+        android:text="@string/hello_world"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+       />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Send Message"
+        android:onClick="onSendMessage"
+        android:visibility="gone"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Send Data String"
+        android:onClick="onSendDataString"
+        android:visibility="gone"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Send Data Image"
+        android:onClick="onSendDataImage"
+        android:visibility="gone"
+        />
+
+    <ViewFlipper
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/menuFlipper"
+        android:layout_gravity="center_horizontal" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="빠른 길찾기"
+            android:id="@+id/textView"
+            android:textSize="50dp"
+            android:gravity="center_vertical|center_horizontal" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="일반 길찾기"
+            android:id="@+id/textView2"
+            android:textSize="50dp"
+            android:gravity="center_vertical|center_horizontal"  />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="공간지각 확장"
+            android:id="@+id/textView3"
+            android:textSize="50dp"
+            android:gravity="center_vertical|center_horizontal"  />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="시간표 확인"
+            android:id="@+id/textView4"
+            android:textSize="50dp"
+            android:gravity="center_vertical|center_horizontal"  />
+    </ViewFlipper>
+
+</LinearLayout>

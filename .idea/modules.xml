@@ -2,10 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/build.iml" filepath="$PROJECT_DIR$/build.iml" />
       <module fileurl="file://$PROJECT_DIR$/mobile/mobile.iml" filepath="$PROJECT_DIR$/mobile/mobile.iml" />
       <module fileurl="file://$PROJECT_DIR$/nmaps/nmaps.iml" filepath="$PROJECT_DIR$/nmaps/nmaps.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pCP.iml" filepath="$PROJECT_DIR$/pCP.iml" />
       <module fileurl="file://$PROJECT_DIR$/wear/wear.iml" filepath="$PROJECT_DIR$/wear/wear.iml" />
     </modules>
   </component>
 </project>
+

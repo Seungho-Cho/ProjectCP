@@ -1,36 +1,41 @@
 package com.example.wearable.datalayerexample;
 
-        import android.app.Activity;
-        import android.graphics.Bitmap;
-        import android.graphics.BitmapFactory;
-        import android.graphics.Color;
-        import android.graphics.drawable.BitmapDrawable;
-        import android.os.Bundle;
-        import android.support.wearable.view.DismissOverlayView;
-        import android.support.wearable.view.WatchViewStub;
-        import android.util.Log;
-        import android.view.GestureDetector;
-        import android.view.MotionEvent;
-        import android.view.View;
-        import android.widget.TextView;
-        import android.widget.Toast;
+import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.os.Bundle;
+import android.support.wearable.view.WatchViewStub;
+import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-        import com.google.android.gms.common.ConnectionResult;
-        import com.google.android.gms.common.api.GoogleApiClient;
-        import com.google.android.gms.common.api.Result;
-        import com.google.android.gms.common.api.ResultCallback;
-        import com.google.android.gms.wearable.Asset;
-        import com.google.android.gms.wearable.DataApi;
-        import com.google.android.gms.wearable.DataEvent;
-        import com.google.android.gms.wearable.DataEventBuffer;
-        import com.google.android.gms.wearable.DataMapItem;
-        import com.google.android.gms.wearable.MessageApi;
-        import com.google.android.gms.wearable.MessageEvent;
-        import com.google.android.gms.wearable.Node;
-        import com.google.android.gms.wearable.NodeApi;
-        import com.google.android.gms.wearable.Wearable;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.Asset;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.Wearable;
 
-        import java.io.InputStream;
+import java.io.InputStream;
 
 public class MyActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks,
@@ -38,10 +43,20 @@ public class MyActivity extends Activity
         NodeApi.NodeListener,
         MessageApi.MessageListener,
         DataApi.DataListener,
-        GestureDetector.OnGestureListener
+        GestureDetector.OnGestureListener,
+        SensorEventListener
 {
 
     private TextView mTextView; // 텍스트를 출력할 뷰
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+                SensorManager.SENSOR_DELAY_GAME);
+    }
+
     private View mLayout; // 배경을 출력할 레이아웃
 
     private GoogleApiClient mGoogleApiClient; // 구글 플레이 서비스 API 객체
@@ -57,6 +72,14 @@ public class MyActivity extends Activity
     private long tap_time = 0;
     private int tap_count = 0;
     private int tap_on = 0;
+
+
+
+
+    private ImageView compassImage;         // 컴퍼스 이미지 뷰
+    private float currentDegree = 0f;      // 현재 각도
+    private SensorManager mSensorManager;   // 센서 매니저
+    TextView viewDegree;                      // 각도 텍스트 표시
 
     @Override
     public boolean onTouchEvent(MotionEvent event)
@@ -74,6 +97,7 @@ public class MyActivity extends Activity
 
 
         gestureDetector = new GestureDetector(this);
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
 
 
@@ -86,9 +110,9 @@ public class MyActivity extends Activity
             {
                 mTextView = (TextView) stub.findViewById(R.id.text);
                 mLayout = stub.findViewById(R.id.layout);
-                //dismissOverlayView = (DismissOverlayView) stub.findViewById(R.id.dismiss_overlay);
+                compassImage = (ImageView) stub.findViewById(R.id.img_compass);
+                viewDegree = (TextView) stub.findViewById(R.id.degreeView);
 
-                //mLayout.setBackgroundColor(Color.RED);
                 mLayout.setOnTouchListener(new View.OnTouchListener()
                 {
                     @Override
@@ -458,5 +482,37 @@ public class MyActivity extends Activity
         //send_msg = "";
     }
 
+    @Override
+    public void onSensorChanged(SensorEvent event)
+    {
+        // get the angle around the z-axis rotated
+        float degree = Math.round(event.values[0]);
+
+        viewDegree.setText(Float.toString(degree));
+
+        // create a rotation animation (reverse turn degree degrees)
+        RotateAnimation ra = new RotateAnimation(
+                currentDegree,
+                -degree,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f);
+
+        // how long the animation will take place
+        ra.setDuration(210);
+
+        // set the animation after the end of the reservation status
+        ra.setFillAfter(true);
+
+        // Start the animation
+        compassImage.startAnimation(ra);
+        currentDegree = -degree;
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy)
+    {
+
+    }
 }
 

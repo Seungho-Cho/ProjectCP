@@ -41,7 +41,6 @@ public class MainMenuActivity extends Activity
         DataApi.DataListener,
         GestureDetector.OnGestureListener
 {
-
     private EditText mEditText; // 시계로 전송 할 텍스트뷰
 
     private GoogleApiClient mGoogleApiClient; // 구글 플레이 서비스 API 객체
@@ -127,7 +126,6 @@ public class MainMenuActivity extends Activity
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-
 
     }
 

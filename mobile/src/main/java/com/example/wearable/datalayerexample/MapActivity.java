@@ -277,6 +277,13 @@ public class MapActivity extends NMapActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onDestroy()
+    {
+        tts.destroy();
+        super.onDestroy();
+    }
+
     private final NMapView.OnMapStateChangeListener onMapViewStateChangeListener = new NMapView.OnMapStateChangeListener() {
 
         @Override
@@ -357,7 +364,7 @@ public class MapActivity extends NMapActivity {
         }
 
     };
-
+    // GPS 위치 받는 리스너
     /* MyLocation Listener */
     private final NMapLocationManager.OnLocationChangeListener onMyLocationChangeListener = new NMapLocationManager.OnLocationChangeListener() {
 
@@ -436,6 +443,7 @@ public class MapActivity extends NMapActivity {
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     // 배열 사용 경로 출력 함수
+    /*
     private void cp_gNodePathdataOverlay( GNode[] arr ) {
 
         // set POI data
@@ -452,7 +460,7 @@ public class MapActivity extends NMapActivity {
         NMapPathDataOverlay pathDataOverlay = mOverlayManager.createPathDataOverlay(pathData);
         pathDataOverlay.showAllPathData(0);
     }
-
+    */
     // 링크드리스트 사용 경로 출력 함수
     private void cp_gNodePathdataOverlay( LinkedList<GNode> path) {
 
@@ -472,6 +480,7 @@ public class MapActivity extends NMapActivity {
         pathDataOverlay.showAllPathData(0);
     }
 
+    // POI 출력 테스트 함수
     private void cp_gNodePOIdataOverlay( GNode[] arr ) {
 
         // set POI data
@@ -488,7 +497,145 @@ public class MapActivity extends NMapActivity {
         NMapPOIdataOverlay poiDataOverlay = mOverlayManager.createPOIdataOverlay(poiData, null);
     }
 
+    // 경로 POI 출력 함수
+    private void cp_gNodeMovePath( LinkedList<GNode> path ) {
 
+        // set POI data
+        NMapPathData pathData = new NMapPathData(path.size()+1);
+
+        Toast.makeText(MapActivity.this, new Integer(path.size()+1).toString(),
+                Toast.LENGTH_LONG).show();
+
+        pathData.initPathData();
+        pathData.addPathPoint(location[0]/*lon*/,location[1]/*lang*/, 0);
+        for(GNode node : path) {
+            pathData.addPathPoint(node.lon,node.lat, 0);
+        }
+        pathData.endPathData();
+
+        NMapPathDataOverlay pathDataOverlay = mOverlayManager.createPathDataOverlay(pathData);
+        pathDataOverlay.showAllPathData(0);
+    }
+
+    // 가장 가까운 노드 찾는 함수
+    private int cp_getClosest(double[] location, int to) {
+        int closest;
+        double cloDis, tempDis;
+        NGeoPoint locNP = new NGeoPoint(location[0], location[1]);
+
+        closest = 0;
+        cloDis = NGeoPoint.getDistance(locNP, new NGeoPoint(GNodeArr[closest].lon, GNodeArr[closest].lat));
+        for(int i=1; i<GMap.max; i++) {
+            tempDis = NGeoPoint.getDistance(locNP, new NGeoPoint(GNodeArr[i].lon, GNodeArr[i].lat));
+            if(cloDis > tempDis) {
+                closest = i;
+                cloDis = tempDis;
+            }
+        }
+
+        return closest;
+    }
+
+    // 길안내 이동 경로 확인 함수
+    private boolean cp_checkPath() {
+
+        double dis;
+        GNode prev = null, next = movePath.peekFirst();
+
+
+
+        NGeoPoint locNP = new NGeoPoint(location[0], location[1]);
+        NGeoPoint toNP = new NGeoPoint(next.lon, next.lat);
+
+        dis = NGeoPoint.getDistance(locNP, toNP);
+
+        if(dis < 5) {
+            if(next == movePath.peekLast()) {
+                path = null;
+                movePath = null;
+                guiding = false;
+                cp_TTS("목적지에 도착했습니다");
+            }
+            else {
+                for(GNode node:path) {
+                    if(node == next) {
+                        break;
+                    }
+                    prev = node;
+                }
+                getRadian(prev, movePath.pollFirst(), next = movePath.peekFirst());
+                dis = NGeoPoint.getDistance(toNP, new NGeoPoint(next.lon, next.lat));
+                cp_TTS("다음 노드까지"+new Integer((int)dis).toString()+"미터입니다");
+                //Toast.makeText(MapActivity.this, "Please enable a My Location source in system settings",
+                //        Toast.LENGTH_SHORT).show();
+                //movePath.pollFirst();
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    // 길안내 경로 이탈 확인 함수
+    private boolean cp_checkGuide() {
+        if(path == null)
+            return false;
+
+        double prevDis, nextDis, linDis;
+        GNode prev = null, next;
+        NGeoPoint locNP = new NGeoPoint(location[0], location[1]);
+        next = movePath.peekFirst();
+
+        for(GNode node:path) {
+            if(node == next) {
+                break;
+            }
+            prev = node;
+        }
+        prevDis = NGeoPoint.getDistance(locNP, new NGeoPoint(prev.lon, prev.lat));
+        nextDis = NGeoPoint.getDistance(locNP, new NGeoPoint(next.lon, next.lat));
+        linDis = NGeoPoint.getDistance(new NGeoPoint(prev.lon, prev.lat), new NGeoPoint(next.lon, next.lat));
+        if((linDis*1.5) < (prevDis+nextDis)) {
+            cp_TTS("경로를 이탈하였습니다");
+            return false;
+        }
+
+        return true;
+    }
+
+    // 회전 각도 구하는 함수
+    private double getRadian(GNode p1, GNode p2, GNode p3) {
+        double deg;
+
+        double x1, y1, x2, y2;
+
+        x1 = p2.lon - p1.lon;
+        y1 = p2.lat - p1.lat;
+        x2 = p3.lon - p2.lon;
+        y2 = p3.lat - p2.lat;
+
+        /*
+        x1 = NGeoPoint.getDistance(new NGeoPoint(p1.lon, p1.lat), new NGeoPoint(p2.lon, p1.lat));
+        y1 = NGeoPoint.getDistance(new NGeoPoint(p1.lon, p1.lat), new NGeoPoint(p1.lon, p2.lat));
+        x2 = NGeoPoint.getDistance(new NGeoPoint(p2.lon, p2.lat), new NGeoPoint(p3.lon, p2.lat));
+        y2 = NGeoPoint.getDistance(new NGeoPoint(p2.lon, p2.lat), new NGeoPoint(p2.lon, p3.lat));
+        */
+        deg = Math.toDegrees(Math.asin(((x1*y2)-(x2*y1))/(Math.sqrt((x1*x1)+(y1*y1))*Math.sqrt((x2*x2)+(y2*y2)))));
+        //deg = Math.toDegrees(Math.atan(x1/y1)-Math.atan(x2/y2));
+
+        radText.setText(new Double(deg).toString());
+
+        return deg;
+    }
+
+    private void cp_TTS(String msg)
+    {
+           tts.speak(msg);
+    }
+
+    //////////////////////////////////////////////////////////////
+    // 테스트용 버튼 onClick 함수들
+    ///////////////////////////////////////////////////////////////
     // POI, Path 모두 지우기
     public void onClickCancel(View arg0) {
         mOverlayManager.clearOverlays();
@@ -602,145 +749,5 @@ public class MapActivity extends NMapActivity {
                 }
             }
         }
-    }
-
-    private void cp_gNodeMovePath( LinkedList<GNode> path ) {
-
-        // set POI data
-        NMapPathData pathData = new NMapPathData(path.size()+1);
-
-        Toast.makeText(MapActivity.this, new Integer(path.size()+1).toString(),
-                Toast.LENGTH_LONG).show();
-
-        pathData.initPathData();
-        pathData.addPathPoint(location[0]/*lon*/,location[1]/*lang*/, 0);
-        for(GNode node : path) {
-            pathData.addPathPoint(node.lon,node.lat, 0);
-        }
-        pathData.endPathData();
-
-        NMapPathDataOverlay pathDataOverlay = mOverlayManager.createPathDataOverlay(pathData);
-        pathDataOverlay.showAllPathData(0);
-    }
-
-    //static double getDistance(NGeoPoint from, NGeoPoint to) 두 점 사이의 거리
-
-    private int cp_getClosest(double[] location, int to) {
-        int closest;
-        double cloDis, tempDis;
-        NGeoPoint locNP = new NGeoPoint(location[0], location[1]);
-
-        closest = 0;
-        cloDis = NGeoPoint.getDistance(locNP, new NGeoPoint(GNodeArr[closest].lon, GNodeArr[closest].lat));
-        for(int i=1; i<GMap.max; i++) {
-            tempDis = NGeoPoint.getDistance(locNP, new NGeoPoint(GNodeArr[i].lon, GNodeArr[i].lat));
-            if(cloDis > tempDis) {
-                closest = i;
-                cloDis = tempDis;
-            }
-        }
-
-        return closest;
-    }
-
-    private boolean cp_checkPath() {
-
-        double dis;
-        GNode prev = null, next = movePath.peekFirst();
-
-
-
-        NGeoPoint locNP = new NGeoPoint(location[0], location[1]);
-        NGeoPoint toNP = new NGeoPoint(next.lon, next.lat);
-
-        dis = NGeoPoint.getDistance(locNP, toNP);
-
-        if(dis < 5) {
-            if(next == movePath.peekLast()) {
-                path = null;
-                movePath = null;
-                guiding = false;
-                cp_TTS("목적지에 도착했습니다");
-            }
-            else {
-                for(GNode node:path) {
-                    if(node == next) {
-                        break;
-                    }
-                    prev = node;
-                }
-                getRadian(prev, movePath.pollFirst(), next = movePath.peekFirst());
-                dis = NGeoPoint.getDistance(toNP, new NGeoPoint(next.lon, next.lat));
-                cp_TTS("다음 노드까지"+new Integer((int)dis).toString()+"미터입니다");
-                Toast.makeText(MapActivity.this, "Please enable a My Location source in system settings",
-                        Toast.LENGTH_SHORT).show();
-                //movePath.pollFirst();
-            }
-
-            return true;
-        }
-        return false;
-    }
-
-    private boolean cp_checkGuide() {
-        if(path == null)
-            return false;
-
-        double prevDis, nextDis, linDis;
-        GNode prev = null, next;
-        NGeoPoint locNP = new NGeoPoint(location[0], location[1]);
-        next = movePath.peekFirst();
-
-        for(GNode node:path) {
-            if(node == next) {
-                break;
-            }
-            prev = node;
-        }
-        prevDis = NGeoPoint.getDistance(locNP, new NGeoPoint(prev.lon, prev.lat));
-        nextDis = NGeoPoint.getDistance(locNP, new NGeoPoint(next.lon, next.lat));
-        linDis = NGeoPoint.getDistance(new NGeoPoint(prev.lon, prev.lat), new NGeoPoint(next.lon, next.lat));
-        if((linDis*1.5) < (prevDis+nextDis)) {
-            cp_TTS("경로를 이탈하였습니다");
-            return false;
-        }
-
-        return true;
-    }
-
-    private double getRadian(GNode p1, GNode p2, GNode p3) {
-        double deg;
-
-        double x1, y1, x2, y2;
-
-        x1 = p2.lon - p1.lon;
-        y1 = p2.lat - p1.lat;
-        x2 = p3.lon - p2.lon;
-        y2 = p3.lat - p2.lat;
-
-        /*
-        x1 = NGeoPoint.getDistance(new NGeoPoint(p1.lon, p1.lat), new NGeoPoint(p2.lon, p1.lat));
-        y1 = NGeoPoint.getDistance(new NGeoPoint(p1.lon, p1.lat), new NGeoPoint(p1.lon, p2.lat));
-        x2 = NGeoPoint.getDistance(new NGeoPoint(p2.lon, p2.lat), new NGeoPoint(p3.lon, p2.lat));
-        y2 = NGeoPoint.getDistance(new NGeoPoint(p2.lon, p2.lat), new NGeoPoint(p2.lon, p3.lat));
-        */
-        deg = Math.toDegrees(Math.asin(((x1*y2)-(x2*y1))/(Math.sqrt((x1*x1)+(y1*y1))*Math.sqrt((x2*x2)+(y2*y2)))));
-        //deg = Math.toDegrees(Math.atan(x1/y1)-Math.atan(x2/y2));
-
-        radText.setText(new Double(deg).toString());
-
-        return deg;
-    }
-
-    private void cp_TTS(String msg)
-    {
-           tts.speak(msg);
-    }
-
-    @Override
-    protected void onDestroy()
-    {
-        tts.destroy();
-        super.onDestroy();
     }
 }

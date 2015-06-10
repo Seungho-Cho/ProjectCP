@@ -9,7 +9,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,12 +47,16 @@ public class TimeTableInputActivity extends ActionBarActivity implements TextToS
     Item[] table_data;
     Subject mySubject = new Subject();
 
+    TouchNumView touchview;
+    SerialHash sHash = new SerialHash();
+    LinearLayout yLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_time_table_input);
 
+        yLayout = (LinearLayout) findViewById(R.id.y_layout);
         alist = new ArrayList<Item>(); // 메인 리스트 아이템 객체 생성
         m_Adapter = new CustomAdapter(this, alist); // 메인 어댑터 생성
         m_ListView = (ListView) findViewById(R.id.y_main_listView); // 메인 리스트뷰 연결
@@ -58,6 +64,13 @@ public class TimeTableInputActivity extends ActionBarActivity implements TextToS
         btn = (Button) findViewById(R.id.y_btn_show_table);
         edit = (EditText) findViewById(R.id.y_editText);
         _tts = new TextToSpeech(this, this);
+
+
+        touchview = new TouchNumView(getBaseContext(),edit,null,sHash,0);
+        yLayout.addView(touchview);
+
+
+
 
 
         btn.setOnClickListener(new View.OnClickListener() {

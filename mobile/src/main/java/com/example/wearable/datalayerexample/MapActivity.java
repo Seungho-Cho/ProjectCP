@@ -9,9 +9,11 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,11 +34,7 @@ import com.nhn.android.mapviewer.overlay.NMapPathDataOverlay;
 import java.util.LinkedList;
 
 
-public class MapActivity extends NMapActivity implements SensorEventListener {
-public class MapActivity extends NMapActivity
-        implements GestureDetector.OnGestureListener
-
-{
+public class MapActivity extends NMapActivity implements SensorEventListener, GestureDetector.OnGestureListener{
 
     private static final String LOG_TAG = "MapActivity";
     private static final boolean DEBUG = false;

@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/ProjectCP.iml" filepath="$PROJECT_DIR$/ProjectCP.iml" />
       <module fileurl="file://$PROJECT_DIR$/mobile/mobile.iml" filepath="$PROJECT_DIR$/mobile/mobile.iml" />
       <module fileurl="file://$PROJECT_DIR$/nmaps/nmaps.iml" filepath="$PROJECT_DIR$/nmaps/nmaps.iml" />
       <module fileurl="file://$PROJECT_DIR$/pCP.iml" filepath="$PROJECT_DIR$/pCP.iml" />

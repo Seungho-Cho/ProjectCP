@@ -12,6 +12,7 @@
     <string name="poi">POI</string>
     <string name="gps">GPS</string>
     <string name="guide">안내</string>
+    <string name="space">공간</string>
     <string name="title_activity_map">MapActivity</string>
 
 </resources>

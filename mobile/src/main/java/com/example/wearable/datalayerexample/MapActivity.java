@@ -1,11 +1,14 @@
 package com.example.wearable.datalayerexample;
 
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.speech.tts.TextToSpeech;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,12 +29,10 @@ import com.nhn.android.mapviewer.overlay.NMapOverlayManager;
 import com.nhn.android.mapviewer.overlay.NMapPOIdataOverlay;
 import com.nhn.android.mapviewer.overlay.NMapPathDataOverlay;
 
-import org.w3c.dom.Text;
-
 import java.util.LinkedList;
 
 
-public class MapActivity extends NMapActivity {
+public class MapActivity extends NMapActivity implements SensorEventListener {
 
     private static final String LOG_TAG = "MapActivity";
     private static final boolean DEBUG = false;
@@ -51,6 +52,8 @@ public class MapActivity extends NMapActivity {
 
     private TTSAdapter tts;
     private Intent mIntent;
+
+    SensorManager sensorM;
 
     GNode[] GNodeArr = {
             new GNode(0, 0, null, null, 126.7320299, 37.3422762),
@@ -118,9 +121,10 @@ public class MapActivity extends NMapActivity {
     MapGraph GMap = new MapGraph(59);
 
     LinkedList<GNode> path = null, movePath = null;
-    boolean guiding = false;
-    double[] location = new double[2];
+    boolean isGuide = false, isComp = false;
+    double[] location = new double[2]; // [0]:longitude, [1]:latitude
     int destination = 0;
+    float comp = 0; //compass
 
     ////////////////////////////////////////////////////
     // test
@@ -170,6 +174,14 @@ public class MapActivity extends NMapActivity {
 
         // create my location overlay
         mMyLocationOverlay = mOverlayManager.createMyLocationOverlay(mMapLocationManager, mMapCompassManager);
+
+        // compass class
+        /*
+        sensorM = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+        sensorM.registerListener(this,//Activity가 직접 리스너를 구현
+                sensorM.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+                SensorManager.SENSOR_DELAY_GAME);
+        */
 
         for(int i=0; i<59; i++) {
             GMap.insertVertex(i, GNodeArr[i]);
@@ -252,6 +264,8 @@ public class MapActivity extends NMapActivity {
         latText = (TextView)findViewById(R.id.latText);
         radText = (TextView)findViewById(R.id.radText);
 
+        switchComp();
+
     }
 
 
@@ -280,6 +294,7 @@ public class MapActivity extends NMapActivity {
     @Override
     protected void onDestroy()
     {
+        mOverlayManager.clearOverlays();
         tts.destroy();
         super.onDestroy();
     }
@@ -378,7 +393,7 @@ public class MapActivity extends NMapActivity {
                 location[1] = myLocation.getLatitude();
                 lonText.setText(Double.toString(location[0]));
                 latText.setText(Double.toString(location[1]));
-                if(guiding) {
+                if(isGuide) {
                     if(path == null) {
                         destination = 28;  //
                         int closest = cp_getClosest(location, destination);
@@ -421,6 +436,15 @@ public class MapActivity extends NMapActivity {
         }
 
     };
+    /*
+    private final NMapCompassManager.OnCompassChangeListener onMyCompassChangeListener = new NMapCompassManager.OnCompassChangeListener() {
+        @Override
+        public boolean onSensorChanged(NMapCompassManager nMapCompassManager, float v) {
+            comp = nMapCompassManager.getHeading();
+            return true;
+        }
+    };
+    */
     private void stopMyLocation() {
         if (mMyLocationOverlay != null) {
             mMapLocationManager.disableMyLocation();
@@ -435,13 +459,81 @@ public class MapActivity extends NMapActivity {
                 //mMapContainerView.requestLayout();
             }
             */
+            //mMapCompassManager.disableCompass();
             mOverlayManager.removeMyLocationOverlay();
+        }
+    }
+
+    //
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        switch(event.sensor.getType()){
+            case Sensor.TYPE_ORIENTATION :
+                comp = (int)event.values[0];
+                Float Comp;
+                Comp = comp;
+                //radText.setText(Comp.toString());
         }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // custom
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    void switchGPS() {
+        //item.setFloatingMode(NMapPOIitem.FLOATING_FIXED);
+        if (mMyLocationOverlay != null) {
+            if (!mOverlayManager.hasOverlay(mMyLocationOverlay)) {
+                mOverlayManager.addOverlay(mMyLocationOverlay);
+            }
+
+            if (mMapLocationManager.isMyLocationEnabled()) {
+                /*
+                if (!mMapView.isAutoRotateEnabled()) {
+                    mMyLocationOverlay.setCompassHeadingVisible(true);
+
+                    mMapCompassManager.enableCompass();
+
+                    mMapView.setAutoRotateEnabled(true, false);
+
+                    //mMapContainerView.requestLayout();
+                } else {
+                    stopMyLocation();
+                }
+                */
+                stopMyLocation();
+
+                mMapView.postInvalidate();
+            } else {
+                boolean isMyLocationEnabled = mMapLocationManager.enableMyLocation(true);
+                if (!isMyLocationEnabled) {
+                    Toast.makeText(MapActivity.this, "Please enable a My Location source in system settings",
+                            Toast.LENGTH_LONG).show();
+
+                    Intent goToSettings = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(goToSettings);
+
+                    return;
+                }
+            }
+        }
+    }
+
+    void switchComp() {
+        if(isComp == false) {
+            sensorM = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+            sensorM.registerListener(this,//Activity가 직접 리스너를 구현
+                    sensorM.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+                    SensorManager.SENSOR_DELAY_GAME);
+            isComp = true;
+        }
+        else {
+            sensorM = null;
+            isComp = false;
+        }
+    }
 
     // 배열 사용 경로 출력 함수
     /*
@@ -555,7 +647,7 @@ public class MapActivity extends NMapActivity {
             if(next == movePath.peekLast()) {
                 path = null;
                 movePath = null;
-                guiding = false;
+                isGuide = false;
                 cp_TTS("목적지에 도착했습니다");
             }
             else {
@@ -636,6 +728,40 @@ public class MapActivity extends NMapActivity {
     }
 
 
+    //////////////////////////////////////////////////////////////////////////////////
+    // 공간 지각 확장 관련 함수 space awareness functions
+    /////////////////////////////////////////////////////////////////////////////////
+
+    void spaceAware(LinkedList<GNode> nodes) {
+        float compass;
+        double lon, lat;
+        double comDir;
+
+        double rad;
+
+        if(isGuide)
+            return;
+        switchGPS();
+        //switchComp();
+        if(mMapLocationManager.isMyLocationEnabled() == false)
+            return;
+
+        for(GNode node : nodes) {
+            lon = location[0];
+            lat = location[1];
+            compass = comp;
+
+            rad = Math.atan2((node.lon - lon),(node.lat - lat));
+            comDir = rad * (180 / Math.PI);
+
+            radText.setText(new Double(comDir).toString());
+            cp_TTS(node.Name+"의 각도는"+(int)comDir+"도 입니다");
+
+        }
+
+    }
+
+
     ///////////////////////////////////////////////////////////
     // 테스트용 버튼 onClick 함수
     ///////////////////////////////////////////////////////////
@@ -673,42 +799,7 @@ public class MapActivity extends NMapActivity {
     }
 
     public void onClickGPS(View arg0) {
-        //item.setFloatingMode(NMapPOIitem.FLOATING_FIXED);
-        if (mMyLocationOverlay != null) {
-            if (!mOverlayManager.hasOverlay(mMyLocationOverlay)) {
-                mOverlayManager.addOverlay(mMyLocationOverlay);
-            }
-
-            if (mMapLocationManager.isMyLocationEnabled()) {
-                /*
-                if (!mMapView.isAutoRotateEnabled()) {
-                    mMyLocationOverlay.setCompassHeadingVisible(true);
-
-                    mMapCompassManager.enableCompass();
-
-                    mMapView.setAutoRotateEnabled(true, false);
-
-                    //mMapContainerView.requestLayout();
-                } else {
-                    stopMyLocation();
-                }
-                */
-                stopMyLocation();
-
-                mMapView.postInvalidate();
-            } else {
-                boolean isMyLocationEnabled = mMapLocationManager.enableMyLocation(true);
-                if (!isMyLocationEnabled) {
-                    Toast.makeText(MapActivity.this, "Please enable a My Location source in system settings",
-                            Toast.LENGTH_LONG).show();
-
-                    Intent goToSettings = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivity(goToSettings);
-
-                    return;
-                }
-            }
-        }
+        switchGPS();
     }
 
     public void onClickGuide(View arg0) {
@@ -733,7 +824,7 @@ public class MapActivity extends NMapActivity {
                 }
                 */
                 stopMyLocation();
-                guiding = false;
+                isGuide = false;
 
                 mMapView.postInvalidate();
             } else {
@@ -749,9 +840,18 @@ public class MapActivity extends NMapActivity {
                     return;
                 }
                 else  {
-                    guiding = true;
+                    isGuide = true;
                 }
             }
         }
+    }
+
+    public void onClickSpace(View arg0) {
+        LinkedList<GNode> sa = new LinkedList<GNode>();
+        sa.add(GNodeArr[4]);
+        sa.add(GNodeArr[7]);
+        sa.add(GNodeArr[9]);
+
+        spaceAware(sa);
     }
 }

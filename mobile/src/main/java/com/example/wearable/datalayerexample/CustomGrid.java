@@ -80,25 +80,25 @@ public class CustomGrid extends BaseAdapter {
                     Color color = new Color();
                     switch(colorType)
                     {
-                        case 0:     //»¡°­
+                        case 0:
                             grid.setBackgroundColor(Color.parseColor("#FF0000"));
                             break;
-                        case 1:    //ÁÖÈ²
+                        case 1:
                             grid.setBackgroundColor(Color.parseColor("#FF5E00"));
                             break;
-                        case 2:     //³ë¶û
+                        case 2:
                             grid.setBackgroundColor(Color.parseColor("#FFE400"));
                             break;
-                        case 3:     //ÃÊ·Ï
+                        case 3:
                             grid.setBackgroundColor(Color.parseColor("#1DDB16"));
                             break;
-                        case 4:     //ÆÄ¶û
+                        case 4:
                             grid.setBackgroundColor(Color.parseColor("#0054FF"));
                             break;
-                        case 5:     //³²»ö
+                        case 5:
                             grid.setBackgroundColor(Color.parseColor("#0100FF"));
                             break;
-                        case 6:     //º¸¶ó
+                        case 6:
                             grid.setBackgroundColor(Color.parseColor("#5F00FF"));
                             break;
                     }

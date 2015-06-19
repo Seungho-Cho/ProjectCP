@@ -430,15 +430,6 @@ public class MapActivity extends NMapActivity implements SensorEventListener, Ge
                 lonText.setText(Double.toString(location[0]));
                 latText.setText(Double.toString(location[1]));
                 if (isGuide) {
-                    if (path == null) {
-                        destination = 28;  //
-                        int closest = cp_getClosest(location, destination);
-                        GMap.executeDijk(closest);
-                        path = GMap.getPath(28/*목적지*/);
-                        movePath = (LinkedList<GNode>) path.clone();
-                        path.addFirst(new GNode(99, 32, null, null, location[0], location[1]));
-                        cp_TTS("안내를 시작합니다");
-                    }
                     mOverlayManager.clearOverlays();
                     cp_gNodeMovePath(movePath);
                     cp_checkGuide();
@@ -767,11 +758,13 @@ public class MapActivity extends NMapActivity implements SensorEventListener, Ge
     /////////////////////////////////////////////////////////////////////////////////
 
     void spaceAware(LinkedList<GNode> nodes) {
-        float compass;
         double lon, lat;
-        double comDir;
+        double compass, comDir, comSA;
+        int comInt, timeDir;
 
         double rad;
+
+        String testStr = "";
 
         if (isGuide)
             return;
@@ -779,13 +772,24 @@ public class MapActivity extends NMapActivity implements SensorEventListener, Ge
         for (GNode node : nodes) {
             lon = location[0];
             lat = location[1];
-            compass = comp;
+            compass = (double)comp;
 
             rad = Math.atan2((node.lon - lon), (node.lat - lat));
             comDir = rad * (180 / Math.PI);
+            if(lon > node.lon)
+                comDir = 360 - comDir;
 
-            radText.setText(new Double(comDir).toString());
-            cp_TTS(node.Name + "의 각도는" + (int) comDir + "도 입니다");
+            comSA = comDir - compass;
+            if(comDir < compass)
+                comSA = comSA + 360;
+
+            comInt = (int)comSA;
+            timeDir = (comInt + 15) / 30;
+
+            testStr.concat(new Integer(timeDir).toString()+"  ");
+
+            radText.setText(testStr);
+            cp_TTS(node.Name + "는 " + timeDir + "시 방향에 있습니다");
 
         }
 
@@ -834,10 +838,22 @@ public class MapActivity extends NMapActivity implements SensorEventListener, Ge
 
     public void onClickGuide(View arg0) {
         //item.setFloatingMode(NMapPOIitem.FLOATING_FIXED);
-        if (isGuide)
+        if (isGuide) {
             isGuide = false;
-        else
+            mOverlayManager.clearOverlays();
+            path = null;
+        }
+        else {
             isGuide = true;
+
+            destination = 28;  // 테스트용 목적지 임의 지정
+            int closest = cp_getClosest(location, destination); // 인접 노드 찾기
+            GMap.executeDijk(closest); // 다익스트라 생성
+            path = GMap.getPath(28/*목적지*/); // 링크드리스트 생성
+            movePath = (LinkedList<GNode>) path.clone(); // 중간 경로용 클론 생성
+            path.addFirst(new GNode(99, 32, null, null, location[0], location[1])); // 현재 위치 삽입
+            cp_TTS("안내를 시작합니다"); // 안내 시작
+        }
     }
 
 

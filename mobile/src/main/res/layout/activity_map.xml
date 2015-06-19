@@ -26,13 +26,6 @@
             android:onClick="onClickPOI" />
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/gps"
-            android:id="@+id/gpsBtn"
-            android:onClick="onClickGPS" />
-
-        <Button
             android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -47,22 +40,12 @@
             android:id="@+id/guideBtn"
             android:onClick="onClickGuide" />
 
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal">
-
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/space"
             android:id="@+id/spaceBtn"
             android:onClick="onClickSpace" />
-
 
     </LinearLayout>
 

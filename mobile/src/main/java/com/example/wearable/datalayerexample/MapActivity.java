@@ -290,16 +290,16 @@ public class MapActivity extends NMapActivity implements SensorEventListener, Ge
         GMap.insertEdge(56, 57, 1);
         GMap.insertEdge(56, 58, 1);
 
+        location[0] = location[1] = 0;
+
         ///////////////////////////////////////
         // test
 
         lonText = (TextView) findViewById(R.id.lonText);
         latText = (TextView) findViewById(R.id.latText);
         radText = (TextView) findViewById(R.id.radText);
-
         switchGPS();
         switchComp();
-
     }
 
 
@@ -500,10 +500,10 @@ public class MapActivity extends NMapActivity implements SensorEventListener, Ge
     public void onSensorChanged(SensorEvent event) {
         switch (event.sensor.getType()) {
             case Sensor.TYPE_ORIENTATION:
-                comp = (int) event.values[0];
+                comp = event.values[0];
                 Float Comp;
                 Comp = comp;
-                //radText.setText(Comp.toString());
+                radText.setText(Comp.toString());
         }
     }
 
@@ -786,9 +786,9 @@ public class MapActivity extends NMapActivity implements SensorEventListener, Ge
             comInt = (int)comSA;
             timeDir = (comInt + 15) / 30;
 
-            testStr.concat(new Integer(timeDir).toString()+"  ");
+            testStr = testStr.concat(new Integer(timeDir).toString()+"  ");
 
-            radText.setText(testStr);
+            //radText.setText(testStr);
             cp_TTS(node.Name + "는 " + timeDir + "시 방향에 있습니다");
 
         }
@@ -844,6 +844,11 @@ public class MapActivity extends NMapActivity implements SensorEventListener, Ge
             path = null;
         }
         else {
+            if (!mMapLocationManager.isMyLocationEnabled()) {
+                switchGPS();
+                return;
+            }
+
             isGuide = true;
 
             destination = 28;  // 테스트용 목적지 임의 지정
@@ -862,6 +867,11 @@ public class MapActivity extends NMapActivity implements SensorEventListener, Ge
         sa.add(GNodeArr[4]);
         sa.add(GNodeArr[7]);
         sa.add(GNodeArr[9]);
+
+        if (!mMapLocationManager.isMyLocationEnabled()) {
+            switchGPS();
+            return;
+        }
 
         spaceAware(sa);
     }

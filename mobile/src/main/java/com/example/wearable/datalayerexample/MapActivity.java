@@ -264,6 +264,47 @@ public class MapActivity extends NMapActivity implements
         radText = (TextView) findViewById(R.id.radText);
         switchGPS();
         switchComp();
+
+
+
+        Thread thred = new Thread()
+        {
+            public void run()
+            {
+                tts.speak("잠시 기다려주세요");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                while(location[0] == 0) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                switch(mode) {
+                    case MODE_NAVI:
+                        Toast.makeText(MapActivity.this, "destination : "+(new Integer(destination).toString()), Toast.LENGTH_SHORT).show();
+                        break;
+
+                    case MODE_SA:
+                        spaceAware();
+                        break;
+
+                    default:
+
+                        break;
+                }
+            }
+        };
+        thred.start();
     }
 
 
@@ -718,29 +759,50 @@ public class MapActivity extends NMapActivity implements
 
 
     //////////////////////////////////////////////////////////////////////////////////
-    // 공간 지각 확장 관련 함수 space awareness functions
+    // 메인 기능 동작 함수
     /////////////////////////////////////////////////////////////////////////////////
 
-    void spaceAware(LinkedList<GNode> nodes) {
+    // 공간 지각 확장 관련 함수 space awareness functions
+    void spaceAware() {
+
+        if (!mMapLocationManager.isMyLocationEnabled()) {
+            tts.speak("GPS가 설정되어 있지 않습니다");
+            finish();
+        }
+
+        if (isGuide)
+            return;
+
+        LinkedList<GNode> nodes = new LinkedList<GNode>();
+
+        LinkedList<String>[] saNodes = new LinkedList[12];
+        for(int i=0; i<12; i++) {
+            saNodes[i] = new LinkedList<String>();
+        }
+
         double lon, lat;
         double compass, comDir, comSA;
         int comInt, timeDir;
 
         double rad;
 
-        String testStr = "";
+        lon = location[0];
+        lat = location[1];
+        compass = (double)comp;
 
-        if (isGuide)
-            return;
+        for(int i=0; i<GMap.max; i++) {
+            if(GNodes.GNodeArr[i].category == filter)
+                nodes.add(GNodes.GNodeArr[i]);
+        }
+
+        tts.speak("공간지각확장을 시작합니다");
 
         for (GNode node : nodes) {
-            lon = location[0];
-            lat = location[1];
-            compass = (double)comp;
 
             rad = Math.atan2((node.lon - lon), (node.lat - lat));
             comDir = rad * (180 / Math.PI);
-            if(lon > node.lon)
+
+            if((lon > node.lon) && (lat < node.lat))
                 comDir = 360 - comDir;
 
             comSA = comDir - compass;
@@ -750,11 +812,19 @@ public class MapActivity extends NMapActivity implements
             comInt = (int)comSA;
             timeDir = (comInt + 15) / 30;
 
-            testStr = testStr.concat(new Integer(timeDir).toString()+"  ");
+            saNodes[timeDir].add(node.Name);
+        }
 
+        //String testStr = "";
+
+        for(int i=0; i<12; i++) {
+            for(String name : saNodes[i]) {
+                //testStr = testStr.concat(new Integer(i).toString()+"  ");
+
+                cp_TTS((i+1) + "시 방향에" + name);
+            }
             //radText.setText(testStr);
-            cp_TTS(node.Name + "는 " + timeDir + "시 방향에 있습니다");
-
+            //testStr = "";
         }
 
     }
@@ -824,22 +894,6 @@ public class MapActivity extends NMapActivity implements
             cp_TTS("안내를 시작합니다"); // 안내 시작
         }
     }
-
-
-    public void onClickSpace(View arg0) {
-        LinkedList<GNode> sa = new LinkedList<GNode>();
-        sa.add(GNodes.GNodeArr[4]);
-        sa.add(GNodes.GNodeArr[7]);
-        sa.add(GNodes.GNodeArr[9]);
-
-        if (!mMapLocationManager.isMyLocationEnabled()) {
-            switchGPS();
-            return;
-        }
-
-        spaceAware(sa);
-    }
-
 
 
     //////////////////////////////////////////////////////////////////////
@@ -970,7 +1024,7 @@ public class MapActivity extends NMapActivity implements
     }
 
     public void swipe_up() {
-
+        finish();
     }
 
     public void swipe_down() {

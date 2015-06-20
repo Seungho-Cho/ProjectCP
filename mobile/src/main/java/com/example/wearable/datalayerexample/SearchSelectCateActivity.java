@@ -13,12 +13,11 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 public class SearchSelectCateActivity extends ActionBarActivity
-        implements GestureDetector.OnGestureListener
+        implements GestureDetector.OnGestureListener,
+        GestureValue
 {
 
-    private static final int SWIPE_MIN_DISTANCE = 120;          // 제스처 최소 거리
-    private static final int SWIPE_MAX_OFF_PATH = 2000;         // 제스처 최대 거리
-    private static final int SWIPE_THRESHOLD_VELOCITY = 50;    // 제스처 인식 속도
+
     private GestureDetector gestureDetector;    // 제스처 처리
 
     private long tap_time = 0;
@@ -77,7 +76,7 @@ public class SearchSelectCateActivity extends ActionBarActivity
     public boolean onSingleTapUp(MotionEvent e) {
         if (tap_count == 2) {
             Log.d("tap", "triple");
-            if (System.currentTimeMillis() <= tap_time + 2000) {
+            if (System.currentTimeMillis() <= tap_time + TAP_TERM) {
                 tap_triple();
                 tap_count = 0;
                 tap_on = 0;
@@ -87,12 +86,12 @@ public class SearchSelectCateActivity extends ActionBarActivity
         if (tap_count == 1) {
             Log.d("tap", "double");
             tap_count = 2;
-            if (System.currentTimeMillis() <= tap_time + 2000) {
+            if (System.currentTimeMillis() <= tap_time + TAP_TERM) {
                 Thread thread = new Thread() {
                     public void run() {
                         tap_on = 2;
                         try {
-                            Thread.sleep(2000);
+                            Thread.sleep(TAP_TERM);
                             if (tap_on == 2) {
                                 tap_double();
                                 tap_count = 0;
@@ -109,7 +108,7 @@ public class SearchSelectCateActivity extends ActionBarActivity
         }
         if (tap_count == 0) {
             Log.d("tap", "single");
-            if (System.currentTimeMillis() > tap_time + 2000) {
+            if (System.currentTimeMillis() > tap_time + TAP_TERM) {
                 tap_time = System.currentTimeMillis();
                 tap_count = 1;
 
@@ -117,7 +116,7 @@ public class SearchSelectCateActivity extends ActionBarActivity
                     public void run() {
                         tap_on = 1;
                         try {
-                            Thread.sleep(2000);
+                            Thread.sleep(TAP_TERM);
                             if (tap_on == 1) {
                                 tap_single();
                                 tap_count = 0;

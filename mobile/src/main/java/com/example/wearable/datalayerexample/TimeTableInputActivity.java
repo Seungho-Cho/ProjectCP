@@ -38,7 +38,6 @@ public class TimeTableInputActivity extends ActionBarActivity implements TextToS
     private Item[] item_data;
     private TextToSpeech myTTS;
     ArrayList<Item> alist;
-    TextToSpeech _tts;
 
     boolean _ttsActive = false;
     ArrayList<Integer> idx_list = new ArrayList<Integer>();
@@ -63,7 +62,6 @@ public class TimeTableInputActivity extends ActionBarActivity implements TextToS
         m_ListView.setAdapter(m_Adapter); // 메인 리스트뷰에 메인 어댑터 연결
         btn = (Button) findViewById(R.id.y_btn_show_table);
         edit = (EditText) findViewById(R.id.y_editText);
-        _tts = new TextToSpeech(this, this);
 
 
         touchview = new TouchNumView(getBaseContext(),edit,null,sHash,0);
@@ -172,31 +170,19 @@ public class TimeTableInputActivity extends ActionBarActivity implements TextToS
     @Override
     public void onPause() {
         super.onPause();
-        try {
-            if (_tts != null) {
-                _tts.stop();
-                _ttsActive = false;
-            }
-        } catch (Exception e) {
-        }
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        _tts = new TextToSpeech(getApplicationContext(), this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        try {
-            if (_tts != null) {
-                _tts.shutdown();
-                _tts = null;
-            }
-        } catch (Exception e) {
-        }
+
+
     }
 
     @Override

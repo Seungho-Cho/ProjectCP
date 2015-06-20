@@ -243,7 +243,7 @@ public class SearchSelectListActivity extends ActionBarActivity
                 break;
             case 2:
 
-                intent.putExtra()
+                //intent.putExtra()
                 intent = new Intent(this,SearchSelectCateActivity.class);
                 break;
         }

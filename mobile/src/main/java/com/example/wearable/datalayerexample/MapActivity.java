@@ -70,7 +70,7 @@ public class MapActivity extends NMapActivity implements SensorEventListener, Ge
 
     LinearLayout main_Layout;
 
-    GNodeList GNodes;
+    GNodeList GNodes = new GNodeList();
 
     MapGraph GMap = new MapGraph(59);
 

@@ -425,7 +425,7 @@ public class MainMenuActivity extends Activity
         switch(current_menu)
         {
             case 1:
-
+                intent = new Intent(this,MapActivity.class);
                 break;
             case 2:
                 intent = new Intent(this,SearchSelectActivity.class);

@@ -285,7 +285,7 @@ public class MapActivity extends NMapActivity implements
                     }
                 }
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -802,8 +802,8 @@ public class MapActivity extends NMapActivity implements
             rad = Math.atan2((node.lon - lon), (node.lat - lat));
             comDir = rad * (180 / Math.PI);
 
-            if((lon > node.lon) && (lat < node.lat))
-                comDir = 360 - comDir;
+            if(lon > node.lon)
+                comDir = 360 + comDir;
 
             comSA = comDir - compass;
             if(comDir < compass)
@@ -826,6 +826,64 @@ public class MapActivity extends NMapActivity implements
             //radText.setText(testStr);
             //testStr = "";
         }
+
+    }
+
+    //각도 test
+    void spaceAware2() {
+
+        if (!mMapLocationManager.isMyLocationEnabled()) {
+            tts.speak("GPS가 설정되어 있지 않습니다");
+            finish();
+        }
+
+        if (isGuide)
+            return;
+
+        LinkedList<GNode> nodes = new LinkedList<GNode>();
+
+        LinkedList<String>[] saNodes = new LinkedList[12];
+        for(int i=0; i<12; i++) {
+            saNodes[i] = new LinkedList<String>();
+        }
+
+        double lon, lat;
+        double compass, comDir, comSA;
+        int comInt, timeDir;
+
+        double rad;
+
+        lon = location[0];
+        lat = location[1];
+        compass = (double)comp;
+
+        for(int i=0; i<GMap.max; i++) {
+            if(GNodes.GNodeArr[i].category == filter)
+                nodes.add(GNodes.GNodeArr[i]);
+        }
+
+        tts.speak("테스트 시작");
+
+        GNode node = GNodes.GNodeArr[4];
+
+            rad = Math.atan2((node.lon - lon), (node.lat - lat));
+            comDir = rad * (180 / Math.PI);
+
+            if(lon > node.lon)
+                comDir = 360 + comDir;
+
+
+        comInt = (int)comDir;
+        tts.speak(comInt +"도");
+
+            comSA = comDir - compass;
+            if(comDir < compass)
+                comSA = comSA + 360;
+
+            comInt = (int)comSA;
+            timeDir = (comInt + 15) / 30;
+
+            saNodes[timeDir].add(node.Name);
 
     }
 

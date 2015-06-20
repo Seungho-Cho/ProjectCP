@@ -28,6 +28,8 @@ public class SearchSelectListActivity extends ActionBarActivity
         private int current_menu = 1;
         private int menu_lenth = 0;
 
+        String list[];
+
         Intent intent;
 
         TTSAdapter tts;
@@ -240,6 +242,8 @@ public class SearchSelectListActivity extends ActionBarActivity
                 intent = new Intent(this,MapActivity.class);
                 break;
             case 2:
+
+                intent.putExtra()
                 intent = new Intent(this,SearchSelectCateActivity.class);
                 break;
         }

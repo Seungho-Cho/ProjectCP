@@ -235,6 +235,7 @@ public class SearchSelectActivity extends ActionBarActivity
                 intent = new Intent(this,MapActivity.class);
                 break;
             case 2:
+                intent.putExtra("SA",0);
                 intent = new Intent(this,SearchSelectCateActivity.class);
                 break;
         }

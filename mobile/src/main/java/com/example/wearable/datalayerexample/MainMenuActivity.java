@@ -430,6 +430,9 @@ public class MainMenuActivity extends Activity
                 intent = new Intent(this,SearchSelectActivity.class);
                 break;
             case 3:
+
+                intent = new Intent(this,SearchSelectCateActivity.class);
+                intent.putExtra("SA",1);
                 break;
             case 4:
                 intent = new Intent(this,TimeTableInputActivity.class);

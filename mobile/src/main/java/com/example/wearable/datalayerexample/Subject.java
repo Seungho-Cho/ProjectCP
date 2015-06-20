@@ -1,5 +1,6 @@
 package com.example.wearable.datalayerexample;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**

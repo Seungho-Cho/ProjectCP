@@ -28,6 +28,11 @@ public class SearchSelectCateActivity extends ActionBarActivity
     private int current_menu = 1;
     TTSAdapter tts;
 
+
+    Intent intent;
+    int mode = 0;
+
+
     /////////////////////  제스처 디텍터 ///////////////////////////////
     @Override
     public boolean onTouchEvent(MotionEvent event)
@@ -51,11 +56,13 @@ public class SearchSelectCateActivity extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search_select);
+        setContentView(R.layout.activity_search_select_cate);
 
         flipper = (ViewFlipper) findViewById(R.id.s_searchFlipper);
         tts = new TTSAdapter(this);
         gestureDetector = new GestureDetector(this);
+        intent = getIntent();
+        mode = intent.getIntExtra("SA",0);
 
 
     }
@@ -143,6 +150,7 @@ public class SearchSelectCateActivity extends ActionBarActivity
     public void onLongPress(MotionEvent e) {
         //cp_TTS("테스트");
         Log.d("tap", "Long");
+        speakHelp();
     }
 
     @Override
@@ -200,6 +208,8 @@ public class SearchSelectCateActivity extends ActionBarActivity
         if(current_menu==0) current_menu=3;
         speakMenu(current_menu);
 
+        speakFirst();
+
     }
 
     public void swipe_up()
@@ -229,18 +239,52 @@ public class SearchSelectCateActivity extends ActionBarActivity
 
     public void selectMenu(int i)
     {
-        Intent intent;
+        Intent nintent = null;
         switch(i)
         {
             case 1:
-                //tts.speak("이름으로 검색");
 
+                if(mode == 1)
+                {
+                    nintent = new Intent(this, MapActivity.class);
+                    nintent.putExtra("mode",2);
+                    nintent.putExtra("filter",8);
+                }
+                else if(mode == 0)
+                {
+
+                }
                 break;
             case 2:
-                //tts.speak("카테고리 검색");
 
+                if(mode == 1)
+                {
+                    nintent = new Intent(this, MapActivity.class);
+                    nintent.putExtra("mode",2);
+                    nintent.putExtra("filter",2);
+                }
+                else if(mode == 0)
+                {
+
+                }
+                break;
+            case 3:
+
+                if(mode == 1)
+                {
+                    nintent = new Intent(this, MapActivity.class);
+                    nintent.putExtra("mode",2);
+                    nintent.putExtra("filter",4);
+                }
+                else if(mode == 0)
+                {
+
+                }
                 break;
         }
+
+        startActivity(nintent);
+        onDestroy();
     }
 
     public void speakMenu(int i)
@@ -256,6 +300,22 @@ public class SearchSelectCateActivity extends ActionBarActivity
             case 3:
                 tts.speak("편의시설");
                 break;
+        }
+    }
+
+    public void speakFirst()
+    {
+        if(mode == 1)
+        {
+            tts.speak("공간지각확장 설정 메뉴 입니다 ");
+            speakMenu(current_menu);
+        }
+    }
+    public void speakHelp()
+    {
+        if(mode == 1)
+        {
+            tts.speak("공간지각확장 설정 메뉴 입니다 설명할 건물을 카테고리 별로 선택 합니다");
         }
     }
 }

@@ -13,8 +13,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.LineNumberReader;
 import java.util.ArrayList;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -40,6 +46,7 @@ public class SearchSelectSttActivity extends ActionBarActivity
     SpeechRecognizer mRecognizer;
     TextView stt_result;
     Handler mHandler;
+    LinearLayout resultList;
 
     Intent srIntent;
 
@@ -58,7 +65,9 @@ public class SearchSelectSttActivity extends ActionBarActivity
     private static final int STATE_SEARCH_OFF = 0;
 
 
-    ResultNode results[] = null;
+   // ResultNode results[] = null;
+    int resultCount = 0;
+    int currentResult = 0;
 
 
     @Override
@@ -66,6 +75,7 @@ public class SearchSelectSttActivity extends ActionBarActivity
     {
         super.onDestroy();
         mRecognizer.destroy();
+        tts.destroy();
     }
 
     /////////////////////  제스처 디텍터 ///////////////////////////////
@@ -85,8 +95,13 @@ public class SearchSelectSttActivity extends ActionBarActivity
         gNodeList = new GNodeList();
         gestureDetector = new GestureDetector(this);
         stt_result = (TextView) findViewById(R.id.stt_text);
+
+        resultList = (LinearLayout) findViewById(R.id.result_list);
+
+
         mHandler = new Handler();
         tts = new TTSAdapter(this);
+
 
         srIntent= new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);            //음성인식 intent생성
         srIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());    //데이터 설정
@@ -116,18 +131,41 @@ public class SearchSelectSttActivity extends ActionBarActivity
             tts.speak(al.get(0)+"으로 검색합니다.");
             state = STATE_SEARCH_ON;
 
+            resultCount = 0;
+            currentResult = 0;
+
+
             for(int i=0; i<gNodeList.GNodeArr.length; i++)
             {
                 if(gNodeList.GNodeArr[i].category == GNodeList.CATE_NODE) continue;
 
                 for(int j=0; j<gNodeList.GNodeArr[i].keywords.length; j++)
                 {
-                    if( gNodeList.GNodeArr[i].keywords[j].compareTo(al.get(0)) == 1)
+
+
+                    if( gNodeList.GNodeArr[i].keywords[j].compareTo(al.get(0)) == 0)
                     {
                         //if(results==null) results[0] = new ResultNode(gNodeList.GNodeArr[i].id,gNodeList.GNodeArr[i].Name);
+                        Log.d("=======result======",gNodeList.GNodeArr[i].Name);
+                        LinearLayout temp = (LinearLayout) View.inflate(getApplicationContext(), R.layout.result_list_layout, null);
+                        TextView noView = (TextView) temp.getChildAt(0);
+                        TextView nameView = (TextView) temp.getChildAt(1);
+
+                        noView.setText(gNodeList.GNodeArr[i].id+"");
+                        nameView.setText(gNodeList.GNodeArr[i].Name);
+
+
+                        resultList.addView(temp);
+                        resultCount++;
                     }
                 }
             }
+
+
+            if(resultCount == 0) return;
+
+            currentResult = 1;
+
 
 
         }
@@ -253,6 +291,7 @@ public class SearchSelectSttActivity extends ActionBarActivity
     @Override
     public void onLongPress(MotionEvent e)
     {
+        Log.d("debug", "LONG");
         mRecognizer.startListening(srIntent);
     }
 
@@ -316,10 +355,30 @@ public class SearchSelectSttActivity extends ActionBarActivity
 
     public void tap_double()
     {
+        if(state == STATE_SEARCH_ON)
+        {
+            if (resultCount > 0)
+            {
+                Intent naviIntent = new Intent(this,MapActivity.class);
+                naviIntent.putExtra("mode",1);
 
+                LinearLayout temp = (LinearLayout) resultList.getChildAt(currentResult - 1);
+                TextView noTemp = (TextView) temp.getChildAt(0);
+                naviIntent.putExtra("dest", Integer.parseInt((String)noTemp.getText()));
+
+                finish();
+                startActivity(naviIntent);
+
+            }
+        }
     }
 
     public void tap_triple()
+    {
+
+    }
+
+    public void select_result()
     {
 
     }

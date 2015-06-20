@@ -283,8 +283,9 @@ public class SearchSelectCateActivity extends ActionBarActivity
                 break;
         }
 
+        finish();
         startActivity(nintent);
-        onDestroy();
+
     }
 
     public void speakMenu(int i)

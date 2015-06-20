@@ -4,6 +4,12 @@ package com.example.wearable.datalayerexample;
  * Created by imac_06 on 15. 6. 20..
  */
 public class GNodeList {
+
+     static final int CATE_NODE = 1;
+     static final int CATE_NORM = 2;
+     static final int CATE_USEF = 4;
+     static final int CATE_ENGI = 8;
+
     GNode[] GNodeArr = {
                 new GNode(0, 1, null, null, 126.7320299, 37.3422762),
                 new GNode(1, 1, null, null, 126.7315529, 37.3417747),

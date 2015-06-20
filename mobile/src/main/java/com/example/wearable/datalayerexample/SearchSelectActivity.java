@@ -232,16 +232,19 @@ public class SearchSelectActivity extends ActionBarActivity
         switch(i)
         {
             case 1:
-                intent = new Intent(this,MapActivity.class);
+                intent = new Intent(this,SearchSelectSttActivity.class);
                 break;
             case 2:
-                intent.putExtra("SA",0);
+
                 intent = new Intent(this,SearchSelectCateActivity.class);
+                intent.putExtra("SA",0);
                 break;
         }
 
+        finish();
         startActivity(intent);
-        onDestroy();
+
+
     }
 
     public void speakMenu(int i)

@@ -247,8 +247,9 @@ public class SearchSelectListActivity extends ActionBarActivity
                 break;
         }
 
+        finish();
         startActivity(intent);
-        onDestroy();
+
     }
 
     public void speakMenu(int i)

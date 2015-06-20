@@ -21,5 +21,6 @@
     <string name="title_activity_search_select">SearchSelectActivity</string>
     <string name="title_activity_search_select_cate">SearchSelectCateActivity</string>
     <string name="title_activity_search_select_list">SearchSelectListActivity</string>
+    <string name="title_activity_search_select_stt">SearchSelectSttActivity</string>
 
 </resources>

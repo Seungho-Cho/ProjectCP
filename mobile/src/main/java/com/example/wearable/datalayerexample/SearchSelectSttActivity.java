@@ -1,6 +1,7 @@
 package com.example.wearable.datalayerexample;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Handler;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -154,7 +155,7 @@ public class SearchSelectSttActivity extends ActionBarActivity
                         noView.setText(gNodeList.GNodeArr[i].id+"");
                         nameView.setText(gNodeList.GNodeArr[i].Name);
 
-
+                        temp.setBackgroundColor(Color.BLACK);
                         resultList.addView(temp);
                         resultCount++;
                     }
@@ -329,12 +330,21 @@ public class SearchSelectSttActivity extends ActionBarActivity
 
     public void swipe_left()
     {
+        currentResult--;
+        if(currentResult==0) currentResult=resultCount;
+
+        resultList.getChildAt(currentResult).setBackgroundColor(Color.BLACK);
+        resultList.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
 
     }
 
     public void swipe_right()
     {
+        currentResult++;
+        if(currentResult>resultCount) currentResult=1;
 
+        resultList.getChildAt(currentResult-2).setBackgroundColor(Color.BLACK);
+        resultList.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
 
     }
 

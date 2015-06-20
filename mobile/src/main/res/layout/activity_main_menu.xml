@@ -41,8 +41,7 @@
     <ViewFlipper
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/menuFlipper"
-        android:layout_gravity="center_horizontal" >
+        android:id="@+id/menuFlipper">
 
         <TextView
             android:layout_width="match_parent"

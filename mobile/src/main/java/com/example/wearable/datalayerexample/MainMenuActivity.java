@@ -428,7 +428,7 @@ public class MainMenuActivity extends Activity
 
                 break;
             case 2:
-                intent = new Intent(this,MapActivity.class);
+                intent = new Intent(this,SearchSelectActivity.class);
                 break;
             case 3:
                 break;

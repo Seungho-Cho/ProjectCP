@@ -1,0 +1,40 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+
+    <ViewFlipper
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/s_searchFlipper"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_gravity="center">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="공학관"
+            android:textSize="50dp"
+            android:gravity="center_vertical|center_horizontal"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="일반건물"
+            android:textSize="50dp"
+            android:gravity="center_vertical|center_horizontal"
+
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="편의시설"
+            android:textSize="50dp"
+            android:gravity="center_vertical|center_horizontal"
+
+            />
+    </ViewFlipper>
+</LinearLayout>

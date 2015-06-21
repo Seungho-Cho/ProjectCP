@@ -111,12 +111,6 @@ public class MapActivity extends NMapActivity implements
         return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event);
     }
 
-
-    ///////////////////////////////////////////////////
-
-    TextView lonText, latText, radText;
-
-
     ///////////////////  Intent //////////
     Intent intent;
     private int mode;
@@ -124,6 +118,12 @@ public class MapActivity extends NMapActivity implements
     private static final int MODE_NAVI    = 1;
     private static final int MODE_SA      = 2;
     //////////////////////////////////////
+
+
+    /////////////////test 용 텍스트뷰/////////////////////////
+
+    TextView lonText, latText, radText;
+
 
 
     @Override
@@ -391,7 +391,8 @@ public class MapActivity extends NMapActivity implements
 
     @Override
     protected void onDestroy() {
-        //switchComp();
+        if(isComp)
+            switchComp();
         switchGPS();
         mOverlayManager.clearOverlays();
         tts.destroy();
@@ -406,7 +407,7 @@ public class MapActivity extends NMapActivity implements
             if (errorInfo == null) { // success
                 // restore map view state such as map center position and zoom level.
                 //restoreInstanceState();
-                mMapController.setMapCenter(new NGeoPoint(126.7335061, 37.3400342), 14);
+                mMapController.setMapCenter(new NGeoPoint(126.7335061, 37.3400342), 13);
 
             } else { // fail
                 Log.e(LOG_TAG, "onFailedToInitializeWithError: " + errorInfo.toString());
@@ -580,7 +581,7 @@ public class MapActivity extends NMapActivity implements
                 comp = event.values[0];
                 Float Comp;
                 Comp = comp;
-                radText.setText(Comp.toString());
+                radText.setText("스마트폰 : " + Comp.toString());
         }
     }
 
@@ -738,7 +739,7 @@ public class MapActivity extends NMapActivity implements
     // 길안내 이동 경로 확인 함수
     private boolean cp_checkPath() {
 
-        double dis;
+        double dis, dir, timeDir;
         int disInt;
         GNode prev = null, next = movePath.peekFirst();
 
@@ -762,9 +763,12 @@ public class MapActivity extends NMapActivity implements
                     }
                     prev = node;
                 }
-                getMovComp(prev, movePath.pollFirst(), next = movePath.peekFirst());
+                dir = getMovComp(prev, movePath.pollFirst(), next = movePath.peekFirst());
+                timeDir = (dir + 15) / 30;
+                if (timeDir == 0)
+                    timeDir = 12;
                 disInt = (int)NGeoPoint.getDistance(toNP, new NGeoPoint(next.lon, next.lat));
-                tts.speak("다음 노드까지" + disInt + "미터");
+                tts.speak("다음 지점까지" + timeDir + "시 방향으로" + disInt + "미터");
                 //Toast.makeText(MapActivity.this, "Please enable a My Location source in system settings",
                 //        Toast.LENGTH_SHORT).show();
                 //movePath.pollFirst();
@@ -822,7 +826,12 @@ public class MapActivity extends NMapActivity implements
         deg = Math.toDegrees(Math.asin(((x1 * y2) - (x2 * y1)) / (Math.sqrt((x1 * x1) + (y1 * y1)) * Math.sqrt((x2 * x2) + (y2 * y2)))));
         //deg = Math.toDegrees(Math.atan(x1/y1)-Math.atan(x2/y2));
 
-        radText.setText(new Double(deg).toString());
+        //radText.setText(new Double(deg).toString());
+
+        if(deg < 0)
+            deg = 0 - deg;
+        else
+            deg = 360 - deg;
 
         return deg;
     }
@@ -1024,8 +1033,8 @@ public class MapActivity extends NMapActivity implements
     // POI, Path 모두 지우기
     public void onClickCancel(View arg0) {
         mOverlayManager.clearOverlays();
-        //if (isComp)
-        //    switchComp();
+        if (isComp)
+            switchComp();
         if (mMapLocationManager.isMyLocationEnabled())
             switchGPS();
     }
@@ -1196,6 +1205,28 @@ public class MapActivity extends NMapActivity implements
     public void onLongPress(MotionEvent e) {
         //cp_TTS("테스트");
         Log.d("tap", "Long");
+        if(!isGuide)
+            switchComp();
+
+        else if(isComp) {
+
+            GNode destN = movePath.peekFirst();
+            double comDir, comDif;
+            int comInt, timeDir, dis;
+
+            comDir = getPtoPComp(location[0], location[1], destN.lon, destN.lat);
+            comDif = comDir - comp;
+            if (comDir < comp)
+                comDif = comDif + 360;
+            comInt = (int) comDif;
+            timeDir = (comInt + 15) / 30;
+            if (timeDir == 0)
+                timeDir = 12;
+
+            dis = (int) NGeoPoint.getDistance(new NGeoPoint(location[0], location[1]), new NGeoPoint(destN.lon, destN.lat));
+
+            tts.speak(timeDir + "시 방향으로" + dis + "미터");
+        }
     }
 
     @Override
@@ -1321,6 +1352,8 @@ public class MapActivity extends NMapActivity implements
 
                     float degree = Float.parseFloat(msg);
                     comp = degree;
+
+                    radText.setText("스마트워치 : " + (new Float(comp).toString()));
 
                     if(isGuide) {
 

@@ -28,7 +28,7 @@ public class SearchSelectListActivity extends ActionBarActivity
         private int tap_on = 0;
         private int long_press_on = 0;
 
-        private int current_menu = 0;
+        //private int current_menu = 0;
         private int menu_lenth = 0;
 
         ResultNode results[];
@@ -92,6 +92,7 @@ public class SearchSelectListActivity extends ActionBarActivity
                 Log.d("debug","list name:"+name[i]);
                 noView.setText(no[i]+"");
                 nameView.setText(name[i]);
+                tempView.setBackgroundColor(Color.BLACK);
 
                 mainLayout.addView(tempView);
 
@@ -99,11 +100,12 @@ public class SearchSelectListActivity extends ActionBarActivity
 
 
 
-            current_menu = 1;
+            currentResult= 1;
             tts.speak("검색결과가 "+no.length+"개 있습니다");
 
 
             TextView nameView = (TextView)((LinearLayout)mainLayout.getChildAt(0)).getChildAt(1);
+            tts.speak("처음 항목 입니다");
             tts.speak_delay((String) nameView.getText(),1000);
 
 
@@ -258,7 +260,7 @@ public class SearchSelectListActivity extends ActionBarActivity
             mainLayout.getChildAt(currentResult-2).setBackgroundColor(Color.BLACK);
             currentResult=1;
             mainLayout.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
-            LinearLayout l_temp = (LinearLayout) mainLayout.getChildAt(currentResult);
+            LinearLayout l_temp = (LinearLayout) mainLayout.getChildAt(0);
             TextView t_temp = (TextView) l_temp.getChildAt(1);
 
             tts.speak((String) t_temp.getText());
@@ -302,10 +304,12 @@ public class SearchSelectListActivity extends ActionBarActivity
     public void selectMenu()
     {
 
-        if( current_menu==0 ) return;
+        if( currentResult==0 ) return;
 
         mainLayout.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
-        LinearLayout l_temp = (LinearLayout) mainLayout.getChildAt(currentResult);
+
+        LinearLayout l_temp = (LinearLayout) mainLayout.getChildAt(currentResult-1);
+
         TextView name = (TextView) l_temp.getChildAt(1);
         TextView no = (TextView) l_temp.getChildAt(0);
 

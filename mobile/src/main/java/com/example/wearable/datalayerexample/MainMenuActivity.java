@@ -442,6 +442,12 @@ public class MainMenuActivity extends Activity
                 table = ((TimeTableActivity) TimeTableActivity.mContext).FileToTimeTable("table.dat");
                 time_list = ((TimeTableActivity)TimeTableActivity.mContext).FileToTimeList("time_list.dat");
 
+                if(table == null)
+                {
+                    tts.speak("먼저 시간표 정보를 가져와야 합니다");
+                    break;
+                }
+
 
                 for(int i = 0; i< time_list.size(); i++)
                 {

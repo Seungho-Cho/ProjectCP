@@ -67,7 +67,7 @@ public class SearchSelectCateActivity extends ActionBarActivity
         speakFirst();
         tts.speak_delay("검색 방법을 선택해 주세요", 1500);
 
-
+        speakMenu(current_menu);
 
     }
 

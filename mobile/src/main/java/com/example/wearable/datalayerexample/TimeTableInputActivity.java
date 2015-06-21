@@ -64,7 +64,7 @@ public class TimeTableInputActivity extends ActionBarActivity implements TextToS
         edit = (EditText) findViewById(R.id.y_editText);
 
 
-        touchview = new TouchNumView(getBaseContext(),edit,null,sHash,0);
+        touchview = new TouchNumView(getBaseContext(),edit,null,sHash,0,this);
         yLayout.addView(touchview);
 
 

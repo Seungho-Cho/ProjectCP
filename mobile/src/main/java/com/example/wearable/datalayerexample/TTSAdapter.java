@@ -13,6 +13,13 @@ public class TTSAdapter implements TextToSpeech.OnInitListener
 {
     private TextToSpeech tts;
     private Activity acticity;
+
+
+    public static final int MODE_SLOW = 0;
+    public static final int MODE_NOMR = 1;
+
+
+
     public TTSAdapter(Activity act)
     {
         this.acticity = act;
@@ -91,6 +98,19 @@ public class TTSAdapter implements TextToSpeech.OnInitListener
             }
         };
         thred.start();
+
+    }
+
+    public void set_speed(int i)
+    {
+        if(i == MODE_NOMR)
+        {
+            tts.setSpeechRate(1.5f);
+        }
+        else if(i == MODE_SLOW)
+        {
+            tts.setSpeechRate(1f);
+        }
 
     }
 

@@ -1,5 +1,6 @@
 package com.example.wearable.datalayerexample;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -38,6 +39,8 @@ public class TouchNumView extends View
     Paint pLine;
     TextView output;
     EditText targetText;
+    TTSAdapter tts;
+    Activity activity;
 
     Path path[] = {new Path(),new Path(),new Path(),new Path(),new Path(),new Path(),new Path(),new Path(),new Path(),new Path(),new Path(),new Path(),new Path(),new Path()};
     Dot dots[] = {new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0)};
@@ -69,15 +72,20 @@ public class TouchNumView extends View
 
     private SendMassgeHandler mMainHandler = null;
 
-    public TouchNumView(Context context,EditText out,EditText edit,SerialHash hash,int learn)
+    public TouchNumView(Context context,EditText out,EditText edit,SerialHash hash,int learn,Activity activity)
     {
         super(context);
         this.context = context;
         this.targetText = edit;
         this.numHash = hash;
         this.is_learn = learn;
+        this.activity = activity;
         index = 0;
         mMainHandler = new SendMassgeHandler(this);
+
+        tts = new TTSAdapter(activity);
+
+        tts.set_speed(TTSAdapter.MODE_SLOW);
 
         output = out;
 
@@ -325,6 +333,10 @@ public class TouchNumView extends View
 
         }
     }
+    public void finish_activity()
+    {
+        activity.finish();
+    }
 
     class SendMassgeHandler extends Handler
     {
@@ -349,10 +361,16 @@ public class TouchNumView extends View
                     if(print_msg.equals("b"))
                     {
                         temp = temp.substring(0,temp.length()-1);
+                        tts.speak("지움");
+                    }
+                    else if(print_msg.equals("x"))
+                    {
+                        activity.finish();
                     }
                     else
                     {
                         temp += print_msg;
+                        tts.speak(print_msg);
                     }
                     output.setText(temp);
                     print_msg = "";

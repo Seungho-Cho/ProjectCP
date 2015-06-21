@@ -85,6 +85,7 @@ public class TimeTableInputActivity extends ActionBarActivity implements TextToS
     public String displayCurrentTime(){
         long now = System.currentTimeMillis();
         Date date = new Date(now);
+        //Date tomorrow = new Date ( date.getTime ( ) + (long) ( 1000 * 60 * 60 * 24*1.7 ) );
         //SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         SimpleDateFormat sdfNow = new SimpleDateFormat("HH:mm");
         String strNow = sdfNow.format(date);

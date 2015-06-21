@@ -457,6 +457,8 @@ public class MainMenuActivity extends Activity
 
                 long now = System.currentTimeMillis();
                 Date date = new Date(now);
+                //Date tomorrow = new Date ( date.getTime ( ) + (long) ( 1000 * 60 * 60 * 24*1.7 ) );
+
                 //SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 SimpleDateFormat sdfDay = new SimpleDateFormat("EEEE");
                 SimpleDateFormat sdfHour = new SimpleDateFormat("HH");

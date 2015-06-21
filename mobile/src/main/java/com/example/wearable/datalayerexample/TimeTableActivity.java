@@ -125,20 +125,20 @@ public class TimeTableActivity extends ActionBarActivity
         gestureDetector = new GestureDetector(this);
 
 
-        map.put(14, new TimeTable("화요일",10,30,"엔터프라이즈 컴퓨팅",54));
-        map.put(20, new TimeTable("화요일",11,30,"엔터프라이즈 컴퓨팅",44));
-        map.put(33, new TimeTable("수요일",13,30,"엔터프라이즈 컴퓨팅",33));
-        map.put(44, new TimeTable("화요일",15,30,"스포츠 클라이밍",22));
-        map.put(50, new TimeTable("화요일",16,30,"스포츠 클라이밍",11));
-        map.put(62, new TimeTable("화요일",18,15,"EH스마트앱설계",12));
-        map.put(68, new TimeTable("화요일",19,5,"EH스마트앱설계",13));
-        map.put(74, new TimeTable("화요일",20,00,"EH스마트앱설계",14));
-        map.put(64, new TimeTable("목요일",18,15,"네트워크 매니지먼트",15));
-        map.put(70, new TimeTable("목요일",19,5,"네트워크 매니지먼트",16));
-        map.put(76, new TimeTable("목요일",20,00,"네트워크 매니지먼트",17));
-        map.put(82, new TimeTable("목요일",20,50,"네트워크 매니지먼트",15));
-        map.put(57, new TimeTable("수요일",17,25, "종합설계",12));
-        map.put(63, new TimeTable("수요일",18,15, "종합설계",15));
+        map.put(13, new TimeTable("월요일",10,30,"엔터프라이즈 컴퓨팅",54));
+        map.put(19, new TimeTable("월요일",11,30,"엔터프라이즈 컴퓨팅",54));
+        map.put(33, new TimeTable("수요일",13,30,"엔터프라이즈 컴퓨팅",54));
+        map.put(49, new TimeTable("월요일",16,30,"스포츠 클라이밍",9));
+        map.put(85, new TimeTable("월요일",21,40,"스포츠 클라이밍",9));
+        map.put(62, new TimeTable("화요일",18,15,"EH스마트앱설계",54));
+        map.put(68, new TimeTable("화요일",19,5,"EH스마트앱설계",54));
+        map.put(74, new TimeTable("화요일",20,00,"EH스마트앱설계",54));
+        map.put(64, new TimeTable("목요일",18,15,"네트워크 매니지먼트",54));
+        map.put(70, new TimeTable("목요일",19,5,"네트워크 매니지먼트",54));
+        map.put(76, new TimeTable("목요일",20,00,"네트워크 매니지먼트",54));
+        map.put(82, new TimeTable("목요일",20,50,"네트워크 매니지먼트",54));
+        map.put(57, new TimeTable("수요일",17,25, "종합설계",54));
+        map.put(63, new TimeTable("수요일",18,15, "종합설계",54));
         map.put(69, new TimeTable("수요일",19,5, "종합설계",54));
         map.put(75, new TimeTable("수요일",20,00, "종합설계",54));
         map.put(45, new TimeTable("수요일",15,30, "기초 중국어",58));
@@ -490,6 +490,7 @@ public class TimeTableActivity extends ActionBarActivity
     {
         long now = System.currentTimeMillis();
         Date date = new Date(now);
+        //Date tomorrow = new Date ( date.getTime ( ) + (long) ( 1000 * 60 * 60 * 24 ) );
         //SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         SimpleDateFormat sdfDay = new SimpleDateFormat("EEEE");
         SimpleDateFormat sdfHour = new SimpleDateFormat("HH");
@@ -566,7 +567,7 @@ public class TimeTableActivity extends ActionBarActivity
     //                        fis.close();
             table = (HashMap<Integer, TimeTable>)obj;
 
-            Toast.makeText(this, table.get(1).getDay() + table.get(1).getHour() +"시" + table.get(1).getMinute() +"분" + table.get(1).getClassName(), Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, table.get(1).getDay() + table.get(1).getHour() +"시" + table.get(1).getMinute() +"분" + table.get(1).getClassName(), Toast.LENGTH_LONG).show();
 
         } catch(Exception e) {
         }

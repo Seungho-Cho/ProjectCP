@@ -101,6 +101,7 @@ public class MapActivity extends NMapActivity implements
     double[] location = new double[2]; // [0]:longitude, [1]:latitude
     int destination = 0;
     float comp = 0; //compass
+    int guideOut = 0;
 
     Handler mHandler;
 
@@ -799,8 +800,14 @@ public class MapActivity extends NMapActivity implements
         nextDis = NGeoPoint.getDistance(locNP, new NGeoPoint(next.lon, next.lat));
         linDis = NGeoPoint.getDistance(new NGeoPoint(prev.lon, prev.lat), new NGeoPoint(next.lon, next.lat));
         if ((linDis * 1.5) < (prevDis + nextDis)) {
-            cp_TTS("경로를 이탈하였습니다");
+            guideOut++;
+            if(guideOut > 3) {
+                cp_TTS("경로를 이탈하였습니다");
+            }
             return false;
+        }
+        else {
+            guideOut = 0;
         }
 
         return true;

@@ -165,13 +165,13 @@ public class MainMenuActivity extends Activity
     // 구글 플레이 서비스에 접속이 일시정지 됐을 때 실행
     @Override // GoogleApiClient.ConnectionCallbacks
     public void onConnectionSuspended(int i) {
-        //Toast.makeText(this, "Connection Suspended", Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this, "Connection Suspended", Toast.LENGTH_SHORT).show();
     }
 
     // 구글 플레이 서비스에 접속을 실패했을 때 실행
     @Override // GoogleApiClient.OnConnectionFailedListener
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        //Toast.makeText(this, "Connection Failed", Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this, "Connection Failed", Toast.LENGTH_SHORT).show();
         //tts.speak("스마트워치가 연결 되지 않았습니다.");
     }
 
@@ -288,6 +288,12 @@ public class MainMenuActivity extends Activity
             }
         }
     }
+
+   /* @Override
+    protected void onPause() {
+        super.onPause();
+        mGoogleApiClient.disconnect();
+    }*/
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent)

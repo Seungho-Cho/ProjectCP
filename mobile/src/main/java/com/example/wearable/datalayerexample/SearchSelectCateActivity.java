@@ -1,24 +1,38 @@
 package com.example.wearable.datalayerexample;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.animation.AnimationUtils;
-import android.widget.Toast;
 import android.widget.ViewFlipper;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.Wearable;
 
 public class SearchSelectCateActivity extends ActionBarActivity
         implements GestureDetector.OnGestureListener,
-        GestureValue
+        GestureValue,
+        GoogleApiClient.ConnectionCallbacks,
+        MessageApi.MessageListener,
+        GoogleApiClient.OnConnectionFailedListener,
+        NodeApi.NodeListener,
+        DataApi.DataListener
 {
 
 
     private GestureDetector gestureDetector;    // 제스처 처리
+    private GoogleApiClient mGoogleApiClient; // 구글 플레이 서비스 API 객체
+
 
     private long tap_time = 0;
     private int tap_count = 0;
@@ -51,6 +65,15 @@ public class SearchSelectCateActivity extends ActionBarActivity
         super.onDestroy();
         tts.destroy();
     }
+    @Override // Activity
+    protected void onStart() {
+        super.onStart();
+
+        // 구글 플레이 서비스에 접속돼 있지 않다면 접속한다.
+        if (!mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.connect();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -61,6 +84,12 @@ public class SearchSelectCateActivity extends ActionBarActivity
         flipper = (ViewFlipper) findViewById(R.id.s_searchFlipper);
         tts = new TTSAdapter(this);
         gestureDetector = new GestureDetector(this);
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
         intent = getIntent();
         mode = intent.getIntExtra("SA",0);
 
@@ -218,7 +247,7 @@ public class SearchSelectCateActivity extends ActionBarActivity
 
     public void swipe_up()
     {
-
+        finish();
     }
 
     public void swipe_down()
@@ -237,6 +266,11 @@ public class SearchSelectCateActivity extends ActionBarActivity
     }
 
     public void tap_triple()
+    {
+
+    }
+
+    public  void tap_long()
     {
 
     }
@@ -377,7 +411,7 @@ public class SearchSelectCateActivity extends ActionBarActivity
     {
         if(mode == 1)
         {
-            tts.speak_delay("공간지각확장 설정 메뉴 입니다 ",1000);
+            tts.speak_delay("공간지각확장 설정 메뉴 입니다 ", 1000);
 
             Thread thread = new Thread()
             {
@@ -420,4 +454,93 @@ public class SearchSelectCateActivity extends ActionBarActivity
             tts.speak("카테고리 검색 메뉴 입니다 검색할 건물을 카테고리 별로 선택 합니다");
         }
     }
+
+    // 구글 플레이 서비스에 접속 됐을 때 실행
+    @Override // GoogleApiClient.ConnectionCallbacks
+    public void onConnected(Bundle bundle) {
+        //Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
+
+        //tts.speak("스마트워치가 연결 되었습니다.");
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
+    }
+
+    // 구글 플레이 서비스에 접속이 일시정지 됐을 때 실행
+    @Override // GoogleApiClient.ConnectionCallbacks
+    public void onConnectionSuspended(int i) {
+        //Toast.makeText(this, "Connection Suspended", Toast.LENGTH_SHORT).show();
+    }
+
+    // 구글 플레이 서비스에 접속을 실패했을 때 실행
+    @Override // GoogleApiClient.OnConnectionFailedListener
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        //Toast.makeText(this, "Connection Failed", Toast.LENGTH_SHORT).show();
+        //tts.speak("스마트워치가 연결 되지 않았습니다.");
+    }
+
+    @Override
+    public void onMessageReceived(MessageEvent messageEvent)
+    {
+        if (messageEvent.getPath().equals("/MESSAGE_PATH")) {
+            // 텍스트뷰에 적용 될 문자열을 지정한다.
+            final String msg = new String(messageEvent.getData(), 0, messageEvent.getData().length);
+
+            // UI 스레드를 실행하여 텍스트 뷰의 값을 수정한다.
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    //mTextView.setText(msg);
+                    //Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_SHORT);
+                    Log.d("ges", msg);
+                    // mEditText.setText(msg);
+
+                    switch (msg) {
+                        case "LEFT_SWIPE":
+                            swipe_left();
+                            break;
+                        case "RIGHT_SWIPE":
+                            swipe_right();
+                            break;
+                        case "UP_SWIPE":
+                            swipe_up();
+                            break;
+                        case "DOWN_SWIPE":
+                            swipe_down();
+                            break;
+                        case "SINGLE_TAP":
+                            tap_single();
+                            break;
+                        case "DOUBLE_TAP":
+                            tap_double();
+                            break;
+                        case "TRIPLE_TAP":
+                            tap_triple();
+                            break;
+                        case "LONG_PRESS":
+                            tap_long();
+                            break;
+
+                    }
+
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onDataChanged(DataEventBuffer dataEventBuffer) {
+
+    }
+
+
+    @Override
+    public void onPeerConnected(Node node) {
+
+    }
+
+    @Override
+    public void onPeerDisconnected(Node node) {
+
+    }
+
+
 }

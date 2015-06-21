@@ -439,10 +439,12 @@ public class MainMenuActivity extends Activity
 
                 ///////////////////////////////////////////////////////////////////////////////
                 //시간표 정보 받아와서 시간, 장소 토스트로 띄우기!
-                table = ((TimeTableActivity) TimeTableActivity.mContext).FileToTimeTable("table.dat");
-                time_list = ((TimeTableActivity)TimeTableActivity.mContext).FileToTimeList("time_list.dat");
-
-                if(table == null)
+                try
+                {
+                    table = ((TimeTableActivity) TimeTableActivity.mContext).FileToTimeTable("table.dat");
+                    time_list = ((TimeTableActivity) TimeTableActivity.mContext).FileToTimeList("time_list.dat");
+                }
+                catch(Exception e)
                 {
                     tts.speak("먼저 시간표 정보를 가져와야 합니다");
                     break;
@@ -509,6 +511,8 @@ public class MainMenuActivity extends Activity
                 if (!check) {
                     //Toast.makeText(MainMenuActivity.this, "오늘 강의는 없습니다.", Toast.LENGTH_SHORT).show();
                     tts.speak("오늘 강의는 없습니다.");
+                    intent = null;
+                    break;
                 }
 
 

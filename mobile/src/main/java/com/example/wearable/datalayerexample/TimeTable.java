@@ -1,14 +1,20 @@
 package com.example.wearable.datalayerexample;
 
+import java.io.Serializable;
+
 /**
  * Created by june on 2015-05-05.
  */
-public class TimeTable {
+public class TimeTable implements Serializable{
 
-    int hour;
-    int minute;
-    String className;
-    String day;
+    private static final long serialVersionUID = 1209L;
+
+    private int loc_code;
+    private int hour;
+    private int minute;
+    private String className;
+    private String day;
+
 
 
     public String getDay() { return day; }
@@ -39,12 +45,16 @@ public class TimeTable {
         this.minute = minute;
     }
 
+    public int getLocCode() { return loc_code; }
 
-    public TimeTable(String day, int hour, int minute, String className){
+    public void setLocCode() { this.loc_code = loc_code; }
+
+    public TimeTable(String day, int hour, int minute, String className, int loc_code){
         this.day = day;
         this.hour = hour;
         this.minute = minute;
         this.className = className;
+        this.loc_code = loc_code;
     }
 
 }

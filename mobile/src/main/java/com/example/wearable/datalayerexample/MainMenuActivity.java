@@ -1,6 +1,7 @@
 package com.example.wearable.datalayerexample;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,6 +32,10 @@ import com.google.android.gms.wearable.Wearable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 
 
 public class MainMenuActivity extends Activity
@@ -48,6 +53,7 @@ public class MainMenuActivity extends Activity
 
     private ViewFlipper menuFlipper;
    // private Handler mHandler;
+    private Context tta;
 
 
     private GestureDetector gestureDetector;    // 제스처 처리
@@ -424,10 +430,76 @@ public class MainMenuActivity extends Activity
     {
         tts.speak(current_menu_name+"를 선택 하였습니다");
         Intent intent = null;
+        HashMap<Integer, TimeTable> table;
+        ArrayList<Integer> time_list;
         switch(current_menu)
         {
             case 1:
-                intent = new Intent(this,MapActivity.class);
+
+                ///////////////////////////////////////////////////////////////////////////////
+                //시간표 정보 받아와서 시간, 장소 토스트로 띄우기!
+                table = ((TimeTableActivity) TimeTableActivity.mContext).FileToTimeTable("table.dat");
+                time_list = ((TimeTableActivity)TimeTableActivity.mContext).FileToTimeList("time_list.dat");
+
+
+                for(int i = 0; i< time_list.size(); i++)
+                {
+                    int temp = time_list.get(i);
+                    Log.d("d","이름: " + table.get(temp).getClassName() + table.get(temp).getHour() + "시" + table.get(temp).getMinute() + "분" + table.get(temp).getDay() + table.get(temp).getLocCode());
+                }
+
+                long now = System.currentTimeMillis();
+                Date date = new Date(now);
+                //SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                SimpleDateFormat sdfDay = new SimpleDateFormat("EEEE");
+                SimpleDateFormat sdfHour = new SimpleDateFormat("HH");
+                SimpleDateFormat sdfMinute = new SimpleDateFormat("mm");
+                String currentDay = sdfDay.format(date);
+                int currentHour = Integer.parseInt(sdfHour.format(date));
+                int currentMinute = Integer.parseInt(sdfMinute.format(date));
+                boolean check = false;
+
+                for (int i = 0; i < time_list.size(); i++) {
+                    int hour = table.get(time_list.get(i)).getHour();
+                    int minute = table.get(time_list.get(i)).getMinute();
+                    String className = table.get(time_list.get(i)).getClassName();
+                    String day = table.get(time_list.get(i)).getDay();
+
+                    //if (day.equals("수요일"))
+                    if (table.get(time_list.get(i)).getDay().equals(currentDay)) {
+                        if (currentHour <= hour) //현재 시간이 강의 시간보다 작으면
+                        {
+                            if (currentHour == hour) {
+                                if (currentMinute <= minute) //현재 분이 강의시간 분보다 작으면
+                                {
+                                    //Toast.makeText(MainMenuActivity.this, "다음 강의는" + className + "이고 강의 시작 시간은" + hour + "시" + minute + "분 입니다.", Toast.LENGTH_SHORT).show();
+                                    tts.speak("다음 강의는 "+ className + "이고 강의 시작 시간은" + hour + "시" + minute + "분 입니다.");
+                                    check = true;
+                                    break;
+                                }
+                            } else {
+                                //Toast.makeText(MainMenuActivity.this, "다음 강의는" + className + "이고 강의 시작 시간은" + hour + "시" + minute + "분 입니다.", Toast.LENGTH_SHORT).show();
+                                tts.speak("다음 강의는" + className + "이고 강의 시작 시간은" + hour + "시" + minute + "분 입니다.");
+                                check = true;
+                                break;
+                            }
+
+                        }
+
+                        //table[time_list.get(i)] = map.get(time_list.get(i));
+
+                    }
+                }
+                if (!check) {
+                    //Toast.makeText(MainMenuActivity.this, "오늘 강의는 없습니다.", Toast.LENGTH_SHORT).show();
+                    tts.speak("오늘 강의는 없습니다.");
+                }
+
+
+
+
+                /////////////////////////////////////////////////////////////////////////////
+
                 break;
             case 2:
                 intent = new Intent(this,SearchSelectActivity.class);
@@ -615,4 +687,8 @@ public class MainMenuActivity extends Activity
             break;
         }
     }
+
+
+
+    ///////////////////////////////////////////////
 }

@@ -18,8 +18,9 @@ public class Item implements Serializable {
     private String day;
     private String subject_no;
     private String lecture_time;
+    private String loc_code;
 
-    public Item(String student_name, String student_number, String major, String subject_name, String day, String subject_no, String lecture_time) {
+    public Item(String student_name, String student_number, String major, String subject_name, String day, String subject_no, String lecture_time, String loc_code) {
         this.student_name = student_name;
         this.student_number = student_number;
         this.major = major;
@@ -27,6 +28,7 @@ public class Item implements Serializable {
         this.day = day;
         this.subject_no = subject_no;
         this.lecture_time = lecture_time;
+        this.loc_code = loc_code;
     }
 
 
@@ -85,6 +87,13 @@ public class Item implements Serializable {
     }
 
     public void setStudent_number(String student_number) {
+        this.student_number = student_number;
+    }
+    public String getLoc_code() {
+        return student_number;
+    }
+
+    public void setLoc_code(String student_number) {
         this.student_number = student_number;
     }
 

@@ -32,6 +32,7 @@ public class TTSAdapter implements TextToSpeech.OnInitListener
             // 해당 언어의 문장이 음성변환 될 수 있다.
             int result = tts.setLanguage(Locale.KOREA);
 
+
             // 해당 언어에 대한 데이터가 없거나 지원하지 않는 경우
             if (result == TextToSpeech.LANG_MISSING_DATA ||
                     result == TextToSpeech.LANG_NOT_SUPPORTED)

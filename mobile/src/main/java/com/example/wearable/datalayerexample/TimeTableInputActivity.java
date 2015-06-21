@@ -76,6 +76,7 @@ public class TimeTableInputActivity extends ActionBarActivity implements TextToS
             public void onClick(View v) {
                 displayCurrentTime();
                 getTimeTable();
+
             }
         });
         loadItems();

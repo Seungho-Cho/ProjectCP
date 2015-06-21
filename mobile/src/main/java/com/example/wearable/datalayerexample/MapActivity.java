@@ -74,7 +74,6 @@ public class MapActivity extends NMapActivity implements
     LinearLayout main_Layout;
 
     GNodeList GNodes = new GNodeList();
-
     MapGraph GMap = new MapGraph(59);
 
     LinkedList<GNode> path = null, movePath = null;

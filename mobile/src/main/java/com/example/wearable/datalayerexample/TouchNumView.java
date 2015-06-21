@@ -113,6 +113,12 @@ public class TouchNumView extends View
         tc.start();
     }
 
+    public void finalize()
+    {
+        tts.destroy();
+    }
+
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event)

@@ -234,8 +234,8 @@ public class SearchSelectListActivity extends ActionBarActivity
             mainLayout.getChildAt(currentResult).setBackgroundColor(Color.BLACK);
             currentResult=resultCount;
             mainLayout.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
-            LinearLayout l_temp = (LinearLayout) mainLayout.getChildAt(currentResult);
-            TextView t_temp = (TextView) l_temp.getChildAt(resultCount-1);
+            LinearLayout l_temp = (LinearLayout) mainLayout.getChildAt(currentResult-1);
+            TextView t_temp = (TextView) l_temp.getChildAt(1);
 
             tts.speak((String) t_temp.getText());
         }
@@ -259,7 +259,7 @@ public class SearchSelectListActivity extends ActionBarActivity
             currentResult=1;
             mainLayout.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
             LinearLayout l_temp = (LinearLayout) mainLayout.getChildAt(currentResult);
-            TextView t_temp = (TextView) l_temp.getChildAt(0);
+            TextView t_temp = (TextView) l_temp.getChildAt(1);
 
             tts.speak((String) t_temp.getText());
         }
@@ -306,7 +306,31 @@ public class SearchSelectListActivity extends ActionBarActivity
 
         mainLayout.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
         LinearLayout l_temp = (LinearLayout) mainLayout.getChildAt(currentResult);
-        TextView t_temp = (TextView) l_temp.getChildAt(0);
+        TextView name = (TextView) l_temp.getChildAt(1);
+        TextView no = (TextView) l_temp.getChildAt(0);
+
+        tts.speak(name.getText()+"길안내로 연결합니다");
+
+        Intent naviIntent = new Intent(this,MapActivity.class);
+        naviIntent.putExtra("mode",1);
+        naviIntent.putExtra("dest",Integer.parseInt((String) no.getText()));
+
+
+        Thread thread = new Thread()
+        {
+            public void run()
+            {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                finish();
+            }
+        };
+        thread.start();
+        startActivity(naviIntent);
+
     }
 
 }

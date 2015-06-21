@@ -422,7 +422,7 @@ public class SearchSelectSttActivity extends ActionBarActivity
                 TextView nameTemp = (TextView) temp.getChildAt(1);
                 naviIntent.putExtra("dest", Integer.parseInt((String)noTemp.getText()));
 
-                tts.speak(nameTemp.getText()+" 길안내로 연결됩니다");
+                tts.speak(nameTemp.getText()+" 길안내로 연결합니다");
 
 
 

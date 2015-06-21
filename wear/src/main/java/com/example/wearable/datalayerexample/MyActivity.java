@@ -81,6 +81,8 @@ public class MyActivity extends Activity
     private SensorManager mSensorManager;   // 센서 매니저
     TextView viewDegree;                      // 각도 텍스트 표시
 
+    private int send_comp_mode = 0;
+
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
@@ -232,62 +234,49 @@ public class MyActivity extends Activity
         {
 
             // 데이터 변경 이벤트일 때 실행된다.
-            if (event.getType() == DataEvent.TYPE_CHANGED)
-            {
+            if (event.getType() == DataEvent.TYPE_CHANGED) {
 
                 // 동작을 구분할 패스를 가져온다.
                 String path = event.getDataItem().getUri().getPath();
 
-                // 패스가 문자 데이터 일 때
-                if (path.equals("/STRING_DATA_PATH"))
+                // 패스가 각도 데이터 일 때
+                if (path.equals("/COMP_DATA"))
                 {
                     // 이벤트 객체로부터 데이터 맵을 가져온다.
-                    DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
+                    //DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
 
-                    // 데이터맵으로부터 수신한 문자열을 가져온다.
-                    final String receiveString = dataMapItem.getDataMap().getString("sendString");
 
-                    // UI 스레드를 실행하여 텍스트 뷰의 값을 수정한다.
-                    runOnUiThread(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            mTextView.setText(receiveString);
-                        }
-                    });
-                }
-                // 패스가 이미지 데이터 일 때
-                else if (path.equals("/IMAGE_DATA_PATH"))
-                {
-
-                    // 이벤트 객체로부터 데이터 맵을 가져온다.
-                    DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
-
-                    // 데이터맵으로부터 수신한 에셋을 가져온다.
-                    Asset assetImage = dataMapItem.getDataMap().getAsset("assetImage");
-
-                    // 에셋으로부터 비트맵을 생성한다.
-                    final Bitmap bitmap = loadBitmapFromAsset(mGoogleApiClient, assetImage);
-
-                    // UI 스레드를 실행하여 레이아웃의 배경을 변경한다.
-                    runOnUiThread(new Runnable()
-                    {
-                        @Override
-                        public void run() {
-                            mLayout.setBackground(new BitmapDrawable(getResources(), bitmap));
-                        }
-                    });
+                    send_comp_mode = 1;
                 }
 
-                // 데이터 삭제 이벤트일 때 실행된다.
-            }
-            else if (event.getType() == DataEvent.TYPE_DELETED)
-            {
-                // 데이터가 삭제됐을 때 수행할 동작
             }
         }
     }
+
+    private void SendComp(float comp)
+    {
+        final String send_comp = Float.toString(comp);
+
+        Wearable.NodeApi.getConnectedNodes(mGoogleApiClient)
+                .setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>()
+                {
+
+                    @Override
+                    public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult)
+                    {
+                        for (final Node node : getConnectedNodesResult.getNodes())
+                        {
+                            byte[] bytes = send_comp.getBytes();
+
+                            Wearable.MessageApi.sendMessage(mGoogleApiClient,
+                                    node.getId(),"/COMP_DATA",bytes )
+                                    .setResultCallback(resultCallback);
+                        }
+                    }
+                });
+
+    }
+
 
     // 비트맵을 에셋(Asset)으로부터 생성한다.
     private Bitmap loadBitmapFromAsset(GoogleApiClient apiClient, Asset asset)
@@ -411,7 +400,14 @@ public class MyActivity extends Activity
     @Override
     public void onLongPress(MotionEvent e)  // 롱 프레스
     {
-        SendGes("LONG_PRESS");
+        if(send_comp_mode == 1)
+        {
+            SendComp(Float.parseFloat((String)viewDegree.getText()));
+        }
+        else
+        {
+            SendGes("LONG_PRESS");
+        }
     }
 
     // 스와이프 처리

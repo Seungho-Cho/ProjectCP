@@ -1,6 +1,7 @@
 package com.example.wearable.datalayerexample;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,7 +9,10 @@ import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.animation.AnimationUtils;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
@@ -24,10 +28,12 @@ public class SearchSelectListActivity extends ActionBarActivity
         private int tap_on = 0;
         private int long_press_on = 0;
 
-        private int current_menu = 1;
+        private int current_menu = 0;
         private int menu_lenth = 0;
 
-        String list[];
+        ResultNode results[];
+        String name[];
+        int no[];
 
         Intent intent;
 
@@ -42,7 +48,9 @@ public class SearchSelectListActivity extends ActionBarActivity
         }
 
 
-        ViewFlipper flipper;
+        LinearLayout mainLayout;
+        int resultCount = 0;
+        int currentResult = 0;
 
 
         @Override
@@ -56,11 +64,47 @@ public class SearchSelectListActivity extends ActionBarActivity
         protected void onCreate(Bundle savedInstanceState)
         {
             super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_search_select);
+            setContentView(R.layout.activity_search_select_list);
 
-            flipper = (ViewFlipper) findViewById(R.id.s_searchFlipper);
+            mainLayout = (LinearLayout) findViewById(R.id.list_main_layout);
             tts = new TTSAdapter(this);
             gestureDetector = new GestureDetector(this);
+            intent = getIntent();
+
+            name = intent.getStringArrayExtra("name_ar");
+            no = intent.getIntArrayExtra("no_ar");
+
+            resultCount = no.length;
+
+            results = new ResultNode[no.length];
+            for(int i=0; i<no.length; i++)
+            {
+                ResultNode temp = new ResultNode(no[i],name[i]);
+                results[i] = temp;
+
+                LinearLayout tempView = (LinearLayout) View.inflate(getApplicationContext(),R.layout.result_list_layout,null);
+                TextView noView = (TextView) tempView.getChildAt(0);
+                TextView nameView = (TextView) tempView.getChildAt(1);
+
+
+
+                Log.d("debug","list no:"+no[i]);
+                Log.d("debug","list name:"+name[i]);
+                noView.setText(no[i]+"");
+                nameView.setText(name[i]);
+
+                mainLayout.addView(tempView);
+
+            }
+
+
+
+            current_menu = 1;
+            tts.speak("검색결과가 "+no.length+"개 있습니다");
+
+
+            TextView nameView = (TextView)((LinearLayout)mainLayout.getChildAt(0)).getChildAt(1);
+            tts.speak_delay((String) nameView.getText(),1000);
 
 
         }
@@ -158,22 +202,22 @@ public class SearchSelectListActivity extends ActionBarActivity
 
             // right to left swipe
             if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Left Swipe", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Left Swipe", Toast.LENGTH_SHORT).show();
                 swipe_left();
             }
             // left to right swipe
             else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Right Swipe", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Right Swipe", Toast.LENGTH_SHORT).show();
                 swipe_right();
             }
             // down to up swipe
             else if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Swipe up", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Swipe up", Toast.LENGTH_SHORT).show();
                 swipe_up();
             }
             // up to down swipe
             else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Swipe down", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Swipe down", Toast.LENGTH_SHORT).show();
                 swipe_down();
             }
         } catch (Exception e) {
@@ -184,27 +228,50 @@ public class SearchSelectListActivity extends ActionBarActivity
 
     public void swipe_left()
     {
-        flipper.setInAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.in_from_right));
-        flipper.setOutAnimation(AnimationUtils.loadAnimation(getApplicationContext(),R.anim.out_from_right));
-        flipper.showNext();
-        current_menu++;
-        if(current_menu==3)
+        currentResult--;
+        if(currentResult==0)
         {
-            tts.speak("처음 항목 입니다.");
-            current_menu=1;
+            mainLayout.getChildAt(currentResult).setBackgroundColor(Color.BLACK);
+            currentResult=resultCount;
+            mainLayout.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
+            LinearLayout l_temp = (LinearLayout) mainLayout.getChildAt(currentResult);
+            TextView t_temp = (TextView) l_temp.getChildAt(resultCount-1);
+
+            tts.speak((String) t_temp.getText());
         }
-        speakMenu(current_menu);
+
+        mainLayout.getChildAt(currentResult).setBackgroundColor(Color.BLACK);
+        mainLayout.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
+
+        LinearLayout l_temp = (LinearLayout) mainLayout.getChildAt(currentResult-1);
+        TextView t_temp = (TextView) l_temp.getChildAt(1);
+
+        tts.speak((String) t_temp.getText());
     }
 
     public void swipe_right()
     {
-        flipper.setInAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.in_from_left));
-        flipper.setOutAnimation(AnimationUtils.loadAnimation(getApplicationContext(),R.anim.out_from_left));
-        flipper.showPrevious();
-        current_menu--;
-        if(current_menu==0) current_menu=2;
-        speakMenu(current_menu);
+        currentResult++;
+        if(currentResult>resultCount)
+        {
+            tts.speak("처음 항목 입니다");
+            mainLayout.getChildAt(currentResult-2).setBackgroundColor(Color.BLACK);
+            currentResult=1;
+            mainLayout.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
+            LinearLayout l_temp = (LinearLayout) mainLayout.getChildAt(currentResult);
+            TextView t_temp = (TextView) l_temp.getChildAt(0);
 
+            tts.speak((String) t_temp.getText());
+        }
+
+        mainLayout.getChildAt(currentResult-2).setBackgroundColor(Color.BLACK);
+        mainLayout.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
+
+
+        LinearLayout l_temp = (LinearLayout) mainLayout.getChildAt(currentResult-1);
+        TextView t_temp = (TextView) l_temp.getChildAt(1);
+
+        tts.speak((String) t_temp.getText());
     }
 
     public void swipe_up()
@@ -224,7 +291,7 @@ public class SearchSelectListActivity extends ActionBarActivity
 
     public void tap_double()
     {
-        selectMenu(current_menu);
+       selectMenu();
     }
 
     public void tap_triple()
@@ -232,37 +299,14 @@ public class SearchSelectListActivity extends ActionBarActivity
 
     }
 
-    public void selectMenu(int i)
+    public void selectMenu()
     {
-        Intent intent = null;
-        switch(i)
-        {
-            case 1:
-                intent = new Intent(this,MapActivity.class);
-                break;
-            case 2:
 
-                //intent.putExtra()
-                intent = new Intent(this,SearchSelectCateActivity.class);
-                break;
-        }
+        if( current_menu==0 ) return;
 
-        finish();
-        startActivity(intent);
-
-    }
-
-    public void speakMenu(int i)
-    {
-        switch(i)
-        {
-            case 1:
-                tts.speak("이름으로 검색");
-                break;
-            case 2:
-                tts.speak("카테고리 검색");
-                break;
-        }
+        mainLayout.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
+        LinearLayout l_temp = (LinearLayout) mainLayout.getChildAt(currentResult);
+        TextView t_temp = (TextView) l_temp.getChildAt(0);
     }
 
 }

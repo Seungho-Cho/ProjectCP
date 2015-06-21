@@ -31,7 +31,7 @@ public class GNodeList {
                 new GNode(17, 1, null, null, 126.7335508, 37.340697),
                 new GNode(18, 1, null, null, 126.7338409, 37.3410369),
                 new GNode(19, 1, null, null, 126.7331917, 37.3404828),
-                new GNode(20, 8, "A동  정문", new String[]{"A동", "공학관", "A"}, 126.733012, 37.3404005),
+                new GNode(20, 8, "A동 정문", new String[]{"A동", "공학관", "A"}, 126.733012, 37.3404005),
                 new GNode(21, 8, "B동", new String[]{"B동", "공학관", "B"}, 126.7333303, 37.3403981),
                 new GNode(22, 1, null, null, 126.7327469, 37.3400473),
                 new GNode(23, 2, "비즈니스센터", new String[]{"비즈니스센터", "비지니스센터", "비센"}, 126.7326993, 37.3397297),

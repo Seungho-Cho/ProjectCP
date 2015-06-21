@@ -740,8 +740,8 @@ public class MapActivity extends NMapActivity implements
     // 길안내 이동 경로 확인 함수
     private boolean cp_checkPath() {
 
-        double dis, dir, timeDir;
-        int disInt;
+        double dis, dir;
+        int dirInt, timeDir, disInt;
         GNode prev = null, next = movePath.peekFirst();
 
 
@@ -750,7 +750,7 @@ public class MapActivity extends NMapActivity implements
 
         dis = NGeoPoint.getDistance(locNP, toNP);
 
-        if (dis < 5) {
+        if (dis < 7) {
             if (next == movePath.peekLast()) {
                 path = null;
                 movePath = null;
@@ -765,7 +765,8 @@ public class MapActivity extends NMapActivity implements
                     prev = node;
                 }
                 dir = getMovComp(prev, movePath.pollFirst(), next = movePath.peekFirst());
-                timeDir = (dir + 15) / 30;
+                dirInt = (int)dir;
+                timeDir = (dirInt + 15) / 30;
                 if (timeDir == 0)
                     timeDir = 12;
                 disInt = (int)NGeoPoint.getDistance(toNP, new NGeoPoint(next.lon, next.lat));
@@ -804,6 +805,7 @@ public class MapActivity extends NMapActivity implements
             if(guideOut > 3) {
                 cp_TTS("경로를 이탈하였습니다");
             }
+            Toast.makeText(getBaseContext(), guideOut+"", Toast.LENGTH_SHORT).show();
             return false;
         }
         else {

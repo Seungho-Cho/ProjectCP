@@ -63,11 +63,34 @@ public class TTSAdapter implements TextToSpeech.OnInitListener
     {
         tts.speak(msg,TextToSpeech.QUEUE_ADD,null);
     }
+    public void speak_f(String msg)
+    {
+        tts.speak(msg,TextToSpeech.QUEUE_FLUSH,null);
+    }
+
 
     public void destroy()
     {
         tts.stop();
         tts.shutdown();
+    }
+
+    public void speak_delay(final String msg, int msec)
+    {
+        Thread thred = new Thread()
+        {
+            public void run()
+            {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                speak(msg);
+            }
+        };
+        thred.start();
+
     }
 
 }

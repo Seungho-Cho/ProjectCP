@@ -56,6 +56,22 @@ public class SearchSelectActivity extends ActionBarActivity
         tts = new TTSAdapter(this);
         gestureDetector = new GestureDetector(this);
 
+        //tts.speak_delay("검색방법을 선택해 주세요",1000);
+
+        Thread thred = new Thread()
+        {
+            public void run()
+            {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                tts.speak("검색방법을 선택해 주세요");
+                speakMenu(current_menu);
+            }
+        };
+        thred.start();
 
     }
 
@@ -152,22 +168,22 @@ public class SearchSelectActivity extends ActionBarActivity
 
             // right to left swipe
             if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Left Swipe", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Left Swipe", Toast.LENGTH_SHORT).show();
                 swipe_left();
             }
             // left to right swipe
             else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Right Swipe", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Right Swipe", Toast.LENGTH_SHORT).show();
                 swipe_right();
             }
             // down to up swipe
             else if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Swipe up", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Swipe up", Toast.LENGTH_SHORT).show();
                 swipe_up();
             }
             // up to down swipe
             else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Swipe down", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Swipe down", Toast.LENGTH_SHORT).show();
                 swipe_down();
             }
         } catch (Exception e) {
@@ -241,7 +257,19 @@ public class SearchSelectActivity extends ActionBarActivity
                 break;
         }
 
-        finish();
+        Thread thread = new Thread()
+        {
+            public void run()
+            {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                finish();
+            }
+        };
+        thread.start();
         startActivity(intent);
 
 

@@ -64,6 +64,9 @@ public class SearchSelectCateActivity extends ActionBarActivity
         intent = getIntent();
         mode = intent.getIntExtra("SA",0);
 
+        tts.speak("검색 방법을 선택해 주세요");
+
+
 
     }
 

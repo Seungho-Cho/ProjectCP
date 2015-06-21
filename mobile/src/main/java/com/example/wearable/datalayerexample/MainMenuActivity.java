@@ -56,6 +56,7 @@ public class MainMenuActivity extends Activity
     private int tap_count = 0;
     private int tap_on = 0;
     private int long_press_on = 0;
+    private int long_press_count = 0;
 
     View main_layout;
     TTSAdapter tts;
@@ -405,9 +406,11 @@ public class MainMenuActivity extends Activity
         {
             public void run()
             {
-                try {
+                try
+                {
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException e)
+                {
                     e.printStackTrace();
                 }
                 tts.speak("처음 화면 입니다");
@@ -448,19 +451,13 @@ public class MainMenuActivity extends Activity
 
 
     @Override
-    public void onDataChanged(DataEventBuffer dataEvents) {
-
-    }
+    public void onDataChanged(DataEventBuffer dataEvents) {}
 
     @Override
-    public void onPeerConnected(Node node) {
-
-    }
+    public void onPeerConnected(Node node) { }
 
     @Override
-    public void onPeerDisconnected(Node node) {
-
-    }
+    public void onPeerDisconnected(Node node) {}
 
     @Override
     public boolean onDown(MotionEvent e) {
@@ -468,10 +465,7 @@ public class MainMenuActivity extends Activity
     }
 
     @Override
-    public void onShowPress(MotionEvent e)
-    {
-            tap_long();
-    }
+    public void onShowPress(MotionEvent e) {}
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
@@ -560,23 +554,7 @@ public class MainMenuActivity extends Activity
     @Override
     public void onLongPress(MotionEvent e)
     {
-        if(long_press_on ==0 )
-        {
-            Thread thread = new Thread()
-            {
-                public void run()
-                {
-                    long_press_on = 1;
-                    tap_long();
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e1) {
-                        e1.printStackTrace();
-                    }
-                    long_press_on = 0;
-                }
-            };
-        }
+        tap_long();
     }
 
     @Override

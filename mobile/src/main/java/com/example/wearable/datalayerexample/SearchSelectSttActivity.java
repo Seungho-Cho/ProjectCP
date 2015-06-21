@@ -112,7 +112,7 @@ public class SearchSelectSttActivity extends ActionBarActivity
         mRecognizer.setRecognitionListener(listener);                                        //음성인식 리스너 등록
 
 
-        tts.speak("이름 검색 입니다.");
+        tts.speak_delay("이름검색 입니다 검색을 시작하려면 화면을 꾹 눌러주세요",1000);
         state = STATE_SEARCH_OFF;
 
 
@@ -163,9 +163,23 @@ public class SearchSelectSttActivity extends ActionBarActivity
             }
 
 
-            if(resultCount == 0) return;
+            if(resultCount == 0)
+            {
+                tts.speak("검색결과가 없습니다");
+                return;
+            }
 
             currentResult = 1;
+
+            tts.speak("검색결과가 "+resultCount+"개 있습니다");
+
+
+            resultList.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
+            LinearLayout l_temp = (LinearLayout) resultList.getChildAt(currentResult);
+            TextView t_temp = (TextView) l_temp.getChildAt(1);
+
+            tts.speak_delay("처음 항목 입니다",500);
+            tts.speak_delay((String) t_temp.getText(),500);
 
 
 
@@ -331,20 +345,50 @@ public class SearchSelectSttActivity extends ActionBarActivity
     public void swipe_left()
     {
         currentResult--;
-        if(currentResult==0) currentResult=resultCount;
+        if(currentResult==0)
+        {
+            resultList.getChildAt(currentResult).setBackgroundColor(Color.BLACK);
+            currentResult=resultCount;
+            resultList.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
+            LinearLayout l_temp = (LinearLayout) resultList.getChildAt(currentResult);
+            TextView t_temp = (TextView) l_temp.getChildAt(1);
+
+            tts.speak((String) t_temp.getText());
+        }
 
         resultList.getChildAt(currentResult).setBackgroundColor(Color.BLACK);
         resultList.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
+
+        LinearLayout l_temp = (LinearLayout) resultList.getChildAt(currentResult-1);
+        TextView t_temp = (TextView) l_temp.getChildAt(1);
+
+        tts.speak((String) t_temp.getText());
 
     }
 
     public void swipe_right()
     {
         currentResult++;
-        if(currentResult>resultCount) currentResult=1;
+        if(currentResult>resultCount)
+        {
+            tts.speak("처음 항목 입니다");
+            resultList.getChildAt(currentResult-2).setBackgroundColor(Color.BLACK);
+            currentResult=1;
+            resultList.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
+            LinearLayout l_temp = (LinearLayout) resultList.getChildAt(currentResult);
+            TextView t_temp = (TextView) l_temp.getChildAt(1);
+
+            tts.speak((String) t_temp.getText());
+        }
 
         resultList.getChildAt(currentResult-2).setBackgroundColor(Color.BLACK);
         resultList.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
+
+
+        LinearLayout l_temp = (LinearLayout) resultList.getChildAt(currentResult-1);
+        TextView t_temp = (TextView) l_temp.getChildAt(1);
+
+        tts.speak((String) t_temp.getText());
 
     }
 
@@ -374,9 +418,27 @@ public class SearchSelectSttActivity extends ActionBarActivity
 
                 LinearLayout temp = (LinearLayout) resultList.getChildAt(currentResult - 1);
                 TextView noTemp = (TextView) temp.getChildAt(0);
+                TextView nameTemp = (TextView) temp.getChildAt(1);
                 naviIntent.putExtra("dest", Integer.parseInt((String)noTemp.getText()));
 
-                finish();
+                tts.speak(nameTemp.getText()+" 길안내로 연결됩니다");
+
+
+
+
+                Thread thread = new Thread()
+                {
+                    public void run()
+                    {
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        finish();
+                    }
+                };
+                thread.start();
                 startActivity(naviIntent);
 
             }
@@ -392,6 +454,8 @@ public class SearchSelectSttActivity extends ActionBarActivity
     {
 
     }
+
+
 
 
 }

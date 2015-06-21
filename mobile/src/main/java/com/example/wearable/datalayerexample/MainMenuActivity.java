@@ -432,6 +432,7 @@ public class MainMenuActivity extends Activity
         Intent intent = null;
         HashMap<Integer, TimeTable> table;
         ArrayList<Integer> time_list;
+        int no= -1;
         switch(current_menu)
         {
             case 1:
@@ -464,6 +465,7 @@ public class MainMenuActivity extends Activity
                     int minute = table.get(time_list.get(i)).getMinute();
                     String className = table.get(time_list.get(i)).getClassName();
                     String day = table.get(time_list.get(i)).getDay();
+                    no = table.get(time_list.get(i)).getLocCode();
 
                     //if (day.equals("수요일"))
                     if (table.get(time_list.get(i)).getDay().equals(currentDay)) {
@@ -483,13 +485,19 @@ public class MainMenuActivity extends Activity
                                 check = true;
                                 break;
                             }
-
                         }
 
-                        //table[time_list.get(i)] = map.get(time_list.get(i));
+
 
                     }
+
                 }
+                if(no != -1) {
+                    intent = new Intent(this, MapActivity.class);
+                    intent.putExtra("mode", 1);
+                    intent.putExtra("dest", no);
+                }
+
                 if (!check) {
                     //Toast.makeText(MainMenuActivity.this, "오늘 강의는 없습니다.", Toast.LENGTH_SHORT).show();
                     tts.speak("오늘 강의는 없습니다.");

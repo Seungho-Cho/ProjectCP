@@ -3,6 +3,7 @@ package com.example.wearable.datalayerexample;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -81,7 +82,7 @@ public class MyActivity extends Activity
     private SensorManager mSensorManager;   // 센서 매니저
     TextView viewDegree;                      // 각도 텍스트 표시
 
-    private int send_comp_mode = 0;
+    private int send_comp_mode = 1;
 
     @Override
     public boolean onTouchEvent(MotionEvent event)
@@ -105,21 +106,17 @@ public class MyActivity extends Activity
 
 
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
-        stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener()
-        {
+        stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
-            public void onLayoutInflated(WatchViewStub stub)
-            {
+            public void onLayoutInflated(WatchViewStub stub) {
                 mTextView = (TextView) stub.findViewById(R.id.text);
                 mLayout = stub.findViewById(R.id.layout);
                 compassImage = (ImageView) stub.findViewById(R.id.img_compass);
                 viewDegree = (TextView) stub.findViewById(R.id.degreeView);
 
-                mLayout.setOnTouchListener(new View.OnTouchListener()
-                {
+                mLayout.setOnTouchListener(new View.OnTouchListener() {
                     @Override
-                    public boolean onTouch(View v, MotionEvent event)
-                    {
+                    public boolean onTouch(View v, MotionEvent event) {
                         gestureDetector.onTouchEvent(event);
                         return true;
                     }
@@ -212,15 +209,16 @@ public class MyActivity extends Activity
             // 텍스트뷰에 적용 될 문자열을 지정한다.
             final String msg = new String(messageEvent.getData(), 0, messageEvent.getData().length);
 
-            // UI 스레드를 실행하여 텍스트 뷰의 값을 수정한다.
-            runOnUiThread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    mTextView.setText(msg);
-                }
-            });
+            if(msg.compareTo("comp_mode_on") == 0) {
+                // UI 스레드를 실행하여 텍스트 뷰의 값을 수정한다.
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        send_comp_mode = 1;
+                        //mTextView.setTextColor(Color.YELLOW);
+                    }
+                });
+            }
         }
     }
 
@@ -240,13 +238,14 @@ public class MyActivity extends Activity
                 String path = event.getDataItem().getUri().getPath();
 
                 // 패스가 각도 데이터 일 때
-                if (path.equals("/COMP_DATA"))
+                if (path.equals("/MESSAGE_PATH"))
                 {
                     // 이벤트 객체로부터 데이터 맵을 가져온다.
                     //DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
 
 
                     send_comp_mode = 1;
+                    mTextView.setTextColor(Color.YELLOW);
                 }
 
             }
@@ -256,24 +255,22 @@ public class MyActivity extends Activity
     private void SendComp(float comp)
     {
         final String send_comp = Float.toString(comp);
+        Toast.makeText(getApplicationContext(), send_comp, Toast.LENGTH_SHORT).show();
 
-        Wearable.NodeApi.getConnectedNodes(mGoogleApiClient)
-                .setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>()
-                {
+                Wearable.NodeApi.getConnectedNodes(mGoogleApiClient)
+                        .setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
 
-                    @Override
-                    public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult)
-                    {
-                        for (final Node node : getConnectedNodesResult.getNodes())
-                        {
-                            byte[] bytes = send_comp.getBytes();
+                            @Override
+                            public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
+                                for (final Node node : getConnectedNodesResult.getNodes()) {
+                                    byte[] bytes = send_comp.getBytes();
 
-                            Wearable.MessageApi.sendMessage(mGoogleApiClient,
-                                    node.getId(),"/COMP_DATA",bytes )
-                                    .setResultCallback(resultCallback);
-                        }
-                    }
-                });
+                                    Wearable.MessageApi.sendMessage(mGoogleApiClient,
+                                            node.getId(), "/COMP_DATA", bytes)
+                                            .setResultCallback(resultCallback);
+                                }
+                            }
+                        });
 
     }
 

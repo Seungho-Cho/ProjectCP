@@ -18,6 +18,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.Wearable;
 import com.nhn.android.maps.NMapActivity;
 import com.nhn.android.maps.NMapCompassManager;
 import com.nhn.android.maps.NMapController;
@@ -36,6 +47,12 @@ import java.util.LinkedList;
 
 
 public class MapActivity extends NMapActivity implements
+
+        GoogleApiClient.ConnectionCallbacks,
+        MessageApi.MessageListener,
+        GoogleApiClient.OnConnectionFailedListener,
+        NodeApi.NodeListener,
+        DataApi.DataListener,
         SensorEventListener,
         GestureDetector.OnGestureListener,
         GestureValue
@@ -65,6 +82,9 @@ public class MapActivity extends NMapActivity implements
 
 
     private GestureDetector gestureDetector;    // 제스처 처리
+    private GoogleApiClient mGoogleApiClient; // 구글 플레이 서비스 API 객체
+
+
 
     private long tap_time = 0;
     private int tap_count = 0;
@@ -143,6 +163,17 @@ public class MapActivity extends NMapActivity implements
         });
 
         //mMapView = new NMapView(this);
+
+        // 구글 플레이 서비스 객체를 시계 설정으로 초기화
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+
+
+
 
         // set a registered API key for Open MapViewer Library
         mMapView.setApiKey(API_KEY);
@@ -291,19 +322,18 @@ public class MapActivity extends NMapActivity implements
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                cp_TTS("시계를 들고, 화면을 길게 눌러주세요");
+                getWatchComp();
+                while(comp == -1) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
                 switch(mode) {
                     case MODE_NAVI:
                         //isGuide = true;
-                        cp_TTS("시계를 들고, 화면을 길게 눌러주세요");
-                        getWatchComp();
-                        while(comp == -1) {
-                            try {
-                                Thread.sleep(100);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
@@ -313,6 +343,7 @@ public class MapActivity extends NMapActivity implements
                         break;
 
                     case MODE_SA:
+                        /*
                         switchComp();
                         while(comp == -1) {
                             try {
@@ -321,6 +352,7 @@ public class MapActivity extends NMapActivity implements
                                 e.printStackTrace();
                             }
                         }
+                        */
                         spaceAware();
                         break;
 
@@ -356,9 +388,10 @@ public class MapActivity extends NMapActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
     protected void onDestroy() {
-        switchComp();
+        //switchComp();
         switchGPS();
         mOverlayManager.clearOverlays();
         tts.destroy();
@@ -991,8 +1024,8 @@ public class MapActivity extends NMapActivity implements
     // POI, Path 모두 지우기
     public void onClickCancel(View arg0) {
         mOverlayManager.clearOverlays();
-        if (isComp)
-            switchComp();
+        //if (isComp)
+        //    switchComp();
         if (mMapLocationManager.isMyLocationEnabled())
             switchGPS();
     }
@@ -1047,8 +1080,40 @@ public class MapActivity extends NMapActivity implements
     /////////////////////////////////////////////////////////////////////
 
     public void getWatchComp() {
-        comp = 0;
+        // 페어링 기기들을 지칭하는 노드를 가져온다.
+        Wearable.NodeApi.getConnectedNodes(mGoogleApiClient)
+                .setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
+
+                    // 노드를 가져온 후 실행된다.
+                    @Override
+                    public void onResult(NodeApi.GetConnectedNodesResult
+                                                 getConnectedNodesResult) {
+
+                        // 노드를 순회하며 메시지를 전송한다.
+                        for (final Node node : getConnectedNodesResult.getNodes()) {
+
+                            // 전송할 메시지 텍스트 생성
+                            String message = "comp_mode_on";
+                            byte[] bytes = message.getBytes();
+
+                            // 메시지 전송 및 전송 후 실행 될 콜백 함수 지정
+                            Wearable.MessageApi.sendMessage(mGoogleApiClient,
+                                    node.getId(), "/MESSAGE_PATH", bytes)
+                                    .setResultCallback(resultCallback);
+                        }
+                    }
+                });
     }
+
+    // 시계로 데이터 및 메시지를 전송 후 실행되는 메소드
+    private ResultCallback resultCallback = new ResultCallback() {
+        @Override
+        public void onResult(Result result) {
+            String resultString = "Sending Result : " + result.getStatus().isSuccess();
+
+           // Toast.makeText(getApplication(), resultString, Toast.LENGTH_SHORT).show();
+        }
+    };
 
     @Override
     public boolean onDown(MotionEvent e) {
@@ -1192,4 +1257,104 @@ public class MapActivity extends NMapActivity implements
     public void tap_triple() {
 
     }
+
+
+    // 액티비티가 시작할 때 실행
+    @Override // Activity
+    protected void onStart() {
+        super.onStart();
+
+        // 구글 플레이 서비스에 접속돼 있지 않다면 접속한다.
+        if (!mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.connect();
+        }
+    }
+    // 액티비티가 종료될 때 실행
+    @Override // Activity
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override // GoogleApiClient.ConnectionCallbacks
+    public void onConnected(Bundle bundle) {
+        //Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
+
+        //tts.speak("스마트워치가 연결 되었습니다.");
+        Wearable.MessageApi.addListener(mGoogleApiClient,this);
+    }
+
+    // 구글 플레이 서비스에 접속이 일시정지 됐을 때 실행
+    @Override // GoogleApiClient.ConnectionCallbacks
+    public void onConnectionSuspended(int i) {
+        //Toast.makeText(this, "Connection Suspended", Toast.LENGTH_SHORT).show();
+    }
+
+    // 구글 플레이 서비스에 접속을 실패했을 때 실행
+    @Override // GoogleApiClient.OnConnectionFailedListener
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        //Toast.makeText(this, "Connection Failed", Toast.LENGTH_SHORT).show();
+        //tts.speak("스마트워치가 연결 되지 않았습니다.");
+    }
+
+
+    @Override
+    public void onDataChanged(DataEventBuffer dataEventBuffer) {
+
+    }
+
+    @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+
+        Log.d("send", "send");
+
+        if (!messageEvent.getPath().equals("/MESSAGE_PATH")) {
+
+            final String msg = new String(messageEvent.getData(), 0, messageEvent.getData().length);
+
+            // UI 스레드를 실행
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    Log.d("degree",msg);
+
+                    float degree = Float.parseFloat(msg);
+                    comp = degree;
+
+                    if(isGuide) {
+
+                        GNode destN = movePath.peekFirst();
+                        double comDir, comDif;
+                        int comInt, timeDir, dis;
+
+                        comDir = getPtoPComp(location[0], location[1], destN.lon, destN.lat);
+                        comDif = comDir - comp;
+                        if (comDir < comp)
+                            comDif = comDif + 360;
+                        comInt = (int) comDif;
+                        timeDir = (comInt + 15) / 30;
+                        if (timeDir == 0)
+                            timeDir = 12;
+
+                        dis = (int) NGeoPoint.getDistance(new NGeoPoint(location[0], location[1]), new NGeoPoint(destN.lon, destN.lat));
+
+                        tts.speak(timeDir + "시 방향으로" + dis + "미터");
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onPeerConnected(Node node) {
+
+    }
+
+    @Override
+    public void onPeerDisconnected(Node node) {
+
+    }
+
+
 }

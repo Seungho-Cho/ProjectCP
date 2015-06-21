@@ -176,7 +176,7 @@ public class SearchSelectSttActivity extends ActionBarActivity
 
             resultList.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
 
-            LinearLayout l_temp = (LinearLayout) resultList.getChildAt(currentResult);
+            LinearLayout l_temp = (LinearLayout) resultList.getChildAt(0);
             TextView t_temp = (TextView) l_temp.getChildAt(1);
 
             tts.speak_delay("처음 항목 입니다",500);

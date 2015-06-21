@@ -64,7 +64,8 @@ public class SearchSelectCateActivity extends ActionBarActivity
         intent = getIntent();
         mode = intent.getIntExtra("SA",0);
 
-        tts.speak("검색 방법을 선택해 주세요");
+        speakFirst();
+        tts.speak_delay("검색 방법을 선택해 주세요", 1500);
 
 
 
@@ -164,22 +165,22 @@ public class SearchSelectCateActivity extends ActionBarActivity
 
             // right to left swipe
             if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Left Swipe", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Left Swipe", Toast.LENGTH_SHORT).show();
                 swipe_left();
             }
             // left to right swipe
             else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Right Swipe", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Right Swipe", Toast.LENGTH_SHORT).show();
                 swipe_right();
             }
             // down to up swipe
             else if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Swipe up", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Swipe up", Toast.LENGTH_SHORT).show();
                 swipe_up();
             }
             // up to down swipe
             else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Swipe down", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Swipe down", Toast.LENGTH_SHORT).show();
                 swipe_down();
             }
         } catch (Exception e) {
@@ -211,7 +212,7 @@ public class SearchSelectCateActivity extends ActionBarActivity
         if(current_menu==0) current_menu=3;
         speakMenu(current_menu);
 
-        speakFirst();
+        //speakFirst();
 
     }
 
@@ -243,6 +244,13 @@ public class SearchSelectCateActivity extends ActionBarActivity
     public void selectMenu(int i)
     {
         Intent nintent = null;
+
+        String name[];
+        int no[];
+        GNodeList list = new GNodeList();
+        int count = 0;
+        int temp_count = 0;
+
         switch(i)
         {
             case 1:
@@ -255,6 +263,26 @@ public class SearchSelectCateActivity extends ActionBarActivity
                 }
                 else if(mode == 0)
                 {
+                    for(int j=0; j<list.GNodeArr.length; j++)
+                    {
+                        if(list.GNodeArr[j].category == 8) count ++;
+                    }
+
+                    name = new String[count];
+                    no = new int[count];
+
+                    for(int j=0; j<list.GNodeArr.length; j++)
+                    {
+                        if(list.GNodeArr[j].category == 8)
+                        {
+                            Log.d("search",list.GNodeArr[j].Name+"/"+list.GNodeArr[j].id);
+                            name[temp_count] = list.GNodeArr[j].Name;
+                            no[temp_count++] = list.GNodeArr[j].id;
+                        }
+                    }
+                    nintent = new Intent(this, SearchSelectListActivity.class);
+                    nintent.putExtra("name_ar",name);
+                    nintent.putExtra("no_ar",no);
 
                 }
                 break;
@@ -268,7 +296,26 @@ public class SearchSelectCateActivity extends ActionBarActivity
                 }
                 else if(mode == 0)
                 {
+                    for(int j=0; j<list.GNodeArr.length; j++)
+                    {
+                        if(list.GNodeArr[j].category == 2) count ++;
+                    }
 
+                    name = new String[count];
+                    no = new int[count];
+
+                    for(int j=0; j<list.GNodeArr.length; j++)
+                    {
+                        if(list.GNodeArr[j].category == 2)
+                        {
+                            Log.d("search",list.GNodeArr[j].Name+"/"+list.GNodeArr[j].id);
+                            name[temp_count] = list.GNodeArr[j].Name;
+                            no[temp_count++] = list.GNodeArr[j].id;
+                        }
+                    }
+                    nintent = new Intent(this, SearchSelectListActivity.class);
+                    nintent.putExtra("name_ar",name);
+                    nintent.putExtra("no_ar",no);
                 }
                 break;
             case 3:
@@ -281,7 +328,26 @@ public class SearchSelectCateActivity extends ActionBarActivity
                 }
                 else if(mode == 0)
                 {
+                    for(int j=0; j<list.GNodeArr.length; j++)
+                    {
+                        if(list.GNodeArr[j].category == 4) count ++;
+                    }
 
+                    name = new String[count];
+                    no = new int[count];
+
+                    for(int j=0; j<list.GNodeArr.length; j++)
+                    {
+                        if(list.GNodeArr[j].category == 4)
+                        {
+                            Log.d("search",list.GNodeArr[j].Name+"/"+list.GNodeArr[j].id);
+                            name[temp_count] = list.GNodeArr[j].Name;
+                            no[temp_count++] = list.GNodeArr[j].id;
+                        }
+                    }
+                    nintent = new Intent(this, SearchSelectListActivity.class);
+                    nintent.putExtra("name_ar",name);
+                    nintent.putExtra("no_ar",no);
                 }
                 break;
         }
@@ -311,8 +377,36 @@ public class SearchSelectCateActivity extends ActionBarActivity
     {
         if(mode == 1)
         {
-            tts.speak("공간지각확장 설정 메뉴 입니다 ");
-            speakMenu(current_menu);
+            tts.speak_delay("공간지각확장 설정 메뉴 입니다 ",1000);
+
+            Thread thread = new Thread()
+            {
+                public void run()
+                {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    speakMenu(current_menu);
+                }
+            };
+        }
+        else
+        {
+            tts.speak_delay("카테고리 검색 메뉴 입니다", 1000);
+            Thread thread = new Thread()
+            {
+                public void run()
+                {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    speakMenu(current_menu);
+                }
+            };
         }
     }
     public void speakHelp()
@@ -320,6 +414,10 @@ public class SearchSelectCateActivity extends ActionBarActivity
         if(mode == 1)
         {
             tts.speak("공간지각확장 설정 메뉴 입니다 설명할 건물을 카테고리 별로 선택 합니다");
+        }
+        else
+        {
+            tts.speak("카테고리 검색 메뉴 입니다 검색할 건물을 카테고리 별로 선택 합니다");
         }
     }
 }

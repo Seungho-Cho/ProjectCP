@@ -301,7 +301,7 @@ public class MainMenuActivity extends Activity
                 @Override
                 public void run() {
                     //mTextView.setText(msg);
-                    Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_SHORT);
+                    //Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_SHORT);
                     Log.d("ges",msg);
                     mEditText.setText(msg);
 

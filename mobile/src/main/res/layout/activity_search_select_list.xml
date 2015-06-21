@@ -2,23 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/list_main_layout">
 
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Item"
-        android:textSize="50dp"
-        android:gravity="center_vertical|center_horizontal"
-        />
-
-    <ViewFlipper
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/s_searchFlipper"
-        android:gravity="center_vertical|center_horizontal"
-        android:layout_gravity="center">
-
-    </ViewFlipper>
 </LinearLayout>

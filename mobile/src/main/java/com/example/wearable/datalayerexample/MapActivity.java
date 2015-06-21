@@ -83,6 +83,8 @@ public class MapActivity extends NMapActivity implements
     int destination = 0;
     float comp = 0; //compass
 
+    Handler mHandler;
+
     /////////////////////  제스처 디텍터 ///////////////////////////////
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -116,6 +118,8 @@ public class MapActivity extends NMapActivity implements
         // get Intent
         intent = this.getIntent();
 
+        mHandler = new Handler();
+
         mode = intent.getIntExtra("mode",0);
 
         if(mode == MODE_NAVI)
@@ -148,7 +152,7 @@ public class MapActivity extends NMapActivity implements
         //setContentView(mMapView);
 
         // initialize map view
-        mMapView.setClickable(true);
+        mMapView.setClickable(false);
 
         // register listener for map state changes
         mMapView.setOnMapStateChangeListener(onMapViewStateChangeListener);
@@ -256,6 +260,7 @@ public class MapActivity extends NMapActivity implements
         GMap.insertEdge(56, 58, 1);
 
         location[0] = location[1] = 0;
+        comp = -1;
 
         ///////////////////////////////////////
         // test
@@ -264,20 +269,17 @@ public class MapActivity extends NMapActivity implements
         latText = (TextView) findViewById(R.id.latText);
         radText = (TextView) findViewById(R.id.radText);
         switchGPS();
-        switchComp();
-
-
 
         Thread thred = new Thread()
         {
             public void run()
             {
-                tts.speak("잠시 기다려주세요");
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                cp_TTS("잠시만 기다려주세요");
                 while(location[0] == 0) {
                     try {
                         Thread.sleep(100);
@@ -292,10 +294,34 @@ public class MapActivity extends NMapActivity implements
                 }
                 switch(mode) {
                     case MODE_NAVI:
-                        Toast.makeText(MapActivity.this, "destination : "+(new Integer(destination).toString()), Toast.LENGTH_SHORT).show();
+                        //isGuide = true;
+                        cp_TTS("시계를 들고, 화면을 길게 눌러주세요");
+                        getWatchComp();
+                        while(comp == -1) {
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                guideStart();
+                            }
+                        });
                         break;
 
                     case MODE_SA:
+                        switchComp();
+                        while(comp == -1) {
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
                         spaceAware();
                         break;
 
@@ -433,9 +459,22 @@ public class MapActivity extends NMapActivity implements
                 //mMapController.animateTo(myLocation);
                 location[0] = myLocation.getLongitude();
                 location[1] = myLocation.getLatitude();
+
+                // debugging용 좌표 출력
                 lonText.setText(Double.toString(location[0]));
                 latText.setText(Double.toString(location[1]));
+
                 if (isGuide) {
+                    /*
+                    if(path == null) {
+                        int closest = cp_getClosest(location, destination); // 인접 노드 찾기
+                        GMap.executeDijk(closest); // 다익스트라 생성
+                        path = GMap.getPath(destination); // 링크드리스트 생성
+                        movePath = (LinkedList<GNode>) path.clone(); // 중간 경로용 클론 생성
+                        path.addFirst(new GNode(99, 32, null, null, location[0], location[1])); // 현재 위치 삽입
+                        cp_TTS("안내를 시작합니다"); // 안내 시작
+                    }
+                    */
                     mOverlayManager.clearOverlays();
                     cp_gNodeMovePath(movePath);
                     cp_checkGuide();
@@ -631,8 +670,8 @@ public class MapActivity extends NMapActivity implements
         // set POI data
         NMapPathData pathData = new NMapPathData(path.size() + 1);
 
-        Toast.makeText(MapActivity.this, new Integer(path.size() + 1).toString(),
-                Toast.LENGTH_LONG).show();
+        //Toast.makeText(MapActivity.this, new Integer(path.size() + 1).toString(),
+        //        Toast.LENGTH_LONG).show();
 
         pathData.initPathData();
         pathData.addPathPoint(location[0]/*lon*/, location[1]/*lang*/, 0);
@@ -668,6 +707,7 @@ public class MapActivity extends NMapActivity implements
     private boolean cp_checkPath() {
 
         double dis;
+        int disInt;
         GNode prev = null, next = movePath.peekFirst();
 
 
@@ -682,6 +722,7 @@ public class MapActivity extends NMapActivity implements
                 movePath = null;
                 isGuide = false;
                 cp_TTS("목적지에 도착했습니다");
+                //finish();
             } else {
                 for (GNode node : path) {
                     if (node == next) {
@@ -689,11 +730,11 @@ public class MapActivity extends NMapActivity implements
                     }
                     prev = node;
                 }
-                getRadian(prev, movePath.pollFirst(), next = movePath.peekFirst());
-                dis = NGeoPoint.getDistance(toNP, new NGeoPoint(next.lon, next.lat));
-                cp_TTS("다음 노드까지" + new Integer((int) dis).toString() + "미터입니다");
-                Toast.makeText(MapActivity.this, "Please enable a My Location source in system settings",
-                        Toast.LENGTH_SHORT).show();
+                getMovComp(prev, movePath.pollFirst(), next = movePath.peekFirst());
+                disInt = (int)NGeoPoint.getDistance(toNP, new NGeoPoint(next.lon, next.lat));
+                tts.speak("다음 노드까지" + disInt + "미터");
+                //Toast.makeText(MapActivity.this, "Please enable a My Location source in system settings",
+                //        Toast.LENGTH_SHORT).show();
                 //movePath.pollFirst();
             }
 
@@ -730,7 +771,7 @@ public class MapActivity extends NMapActivity implements
     }
 
     // 회전 각도 구하는 함수
-    private double getRadian(GNode p1, GNode p2, GNode p3) {
+    private double getMovComp(GNode p1, GNode p2, GNode p3) {
         double deg;
 
         double x1, y1, x2, y2;
@@ -754,20 +795,74 @@ public class MapActivity extends NMapActivity implements
         return deg;
     }
 
+    //두 좌표 북위 각도 차 구하는 함수
+    private double getPtoPComp(double slon, double slat, double dlon, double dlat) {
+        double comDir, rad;
+
+        rad = Math.atan2((dlon - slon), (dlat - slat));
+        comDir = rad * (180 / Math.PI);
+
+        if(slon > dlon)
+            comDir = 360 + comDir;
+
+        return comDir;
+    }
+
     private void cp_TTS(String msg) {
         tts.speak(msg);
     }
-
 
     //////////////////////////////////////////////////////////////////////////////////
     // 메인 기능 동작 함수
     /////////////////////////////////////////////////////////////////////////////////
 
-    // 공간 지각 확장 관련 함수 space awareness functions
+    // 길 안내 함수
+    void guideStart() {
+        if (isGuide) {
+            isGuide = false;
+            mOverlayManager.clearOverlays();
+            path = null;
+        }
+        else {
+            if (!mMapLocationManager.isMyLocationEnabled()) {
+                cp_TTS("GPS가 설정되어 있지 않습니다");
+                finish();
+            }
+
+            isGuide = true;
+
+            int closest = cp_getClosest(location, destination); // 인접 노드 찾기
+            GMap.executeDijk(closest); // 다익스트라 생성
+            path = GMap.getPath(destination); // 링크드리스트 생성
+            movePath = (LinkedList<GNode>) path.clone(); // 중간 경로용 클론 생성
+            path.addFirst(new GNode(99, 32, null, null, location[0], location[1])); // 현재 위치 삽입
+            cp_TTS("안내를 시작합니다"); // 안내 시작
+            cp_gNodeMovePath(movePath);
+
+            GNode destN = movePath.peekFirst();
+            double comDir, comDif;
+            int comInt, timeDir, dis;
+
+            comDir = getPtoPComp(location[0], location[1], destN.lon, destN.lat);
+            comDif = comDir - comp;
+            if(comDir < comp)
+                comDif = comDif + 360;
+            comInt = (int)comDif;
+            timeDir = (comInt + 15) / 30;
+            if(timeDir == 0)
+                timeDir = 12;
+
+            dis = (int)NGeoPoint.getDistance(new NGeoPoint(location[0], location[1]), new NGeoPoint(destN.lon, destN.lat));
+
+            tts.speak(timeDir + "시 방향으로" + dis + "미터");
+        }
+    }
+
+    // 공간 지각 확장 함수 space awareness functions
     void spaceAware() {
 
         if (!mMapLocationManager.isMyLocationEnabled()) {
-            tts.speak("GPS가 설정되어 있지 않습니다");
+            cp_TTS("GPS가 설정되어 있지 않습니다");
             finish();
         }
 
@@ -776,56 +871,57 @@ public class MapActivity extends NMapActivity implements
 
         LinkedList<GNode> nodes = new LinkedList<GNode>();
 
-        LinkedList<String>[] saNodes = new LinkedList[12];
+        LinkedList<GNode>[] saNodes = new LinkedList[12];
         for(int i=0; i<12; i++) {
-            saNodes[i] = new LinkedList<String>();
+            saNodes[i] = new LinkedList<GNode>();
         }
 
         double lon, lat;
-        double compass, comDir, comSA;
-        int comInt, timeDir;
+        double compass;
 
-        double rad;
+        NGeoPoint locNP;
 
         lon = location[0];
         lat = location[1];
         compass = (double)comp;
+        locNP = new NGeoPoint(lon, lat);
 
         for(int i=0; i<GMap.max; i++) {
             if(GNodes.GNodeArr[i].category == filter)
                 nodes.add(GNodes.GNodeArr[i]);
         }
 
-        tts.speak("공간지각확장을 시작합니다");
+        cp_TTS("공간지각확장을 시작합니다");
 
         for (GNode node : nodes) {
+            double comDir, comDif;
+            int comInt, timeDir;
 
-            rad = Math.atan2((node.lon - lon), (node.lat - lat));
-            comDir = rad * (180 / Math.PI);
+            comDir = getPtoPComp(lon, lat, node.lon, node.lat);
 
-            if(lon > node.lon)
-                comDir = 360 + comDir;
-
-            comSA = comDir - compass;
+            comDif = comDir - compass;
             if(comDir < compass)
-                comSA = comSA + 360;
+                comDif = comDif + 360;
 
-            comInt = (int)comSA;
+            comInt = (int)comDif;
             timeDir = (comInt + 15) / 30;
+            if(timeDir == 12)
+                timeDir = 0;
 
-            saNodes[timeDir].add(node.Name);
+            saNodes[timeDir].add(node);
         }
 
-        //String testStr = "";
-
-        for(int i=0; i<12; i++) {
-            for(String name : saNodes[i]) {
-                //testStr = testStr.concat(new Integer(i).toString()+"  ");
-
-                cp_TTS((i+1) + "시 방향에" + name);
+        for(int i=1; i<12; i++) {
+            for(GNode node : saNodes[i]) {
+                int dis = (int)NGeoPoint.getDistance(locNP, new NGeoPoint(node.lon, node.lat));
+                dis = dis - (dis%10);
+                cp_TTS((i) + "시 방향" + dis + "미터" + node.Name);
             }
-            //radText.setText(testStr);
-            //testStr = "";
+        }
+        for(GNode node : saNodes[0]) {
+            int dis = (int)NGeoPoint.getDistance(locNP, new NGeoPoint(node.lon, node.lat));
+            dis = dis - (dis%10);
+            cp_TTS((12) + "시 방향" + dis + "미터" + node.Name);
         }
 
     }
@@ -834,7 +930,7 @@ public class MapActivity extends NMapActivity implements
     void spaceAware2() {
 
         if (!mMapLocationManager.isMyLocationEnabled()) {
-            tts.speak("GPS가 설정되어 있지 않습니다");
+            cp_TTS("GPS가 설정되어 있지 않습니다");
             finish();
         }
 
@@ -863,28 +959,28 @@ public class MapActivity extends NMapActivity implements
                 nodes.add(GNodes.GNodeArr[i]);
         }
 
-        tts.speak("테스트 시작");
+        cp_TTS("테스트 시작");
 
         GNode node = GNodes.GNodeArr[4];
 
-            rad = Math.atan2((node.lon - lon), (node.lat - lat));
-            comDir = rad * (180 / Math.PI);
+        rad = Math.atan2((node.lon - lon), (node.lat - lat));
+        comDir = rad * (180 / Math.PI);
 
-            if(lon > node.lon)
-                comDir = 360 + comDir;
+        if(lon > node.lon)
+            comDir = 360 + comDir;
 
 
         comInt = (int)comDir;
-        tts.speak(comInt +"도");
+        cp_TTS(comInt + "도");
 
-            comSA = comDir - compass;
-            if(comDir < compass)
-                comSA = comSA + 360;
+        comSA = comDir - compass;
+        if(comDir < compass)
+            comSA = comSA + 360;
 
-            comInt = (int)comSA;
-            timeDir = (comInt + 15) / 30;
+        comInt = (int)comSA;
+        timeDir = (comInt + 15) / 30;
 
-            saNodes[timeDir].add(node.Name);
+        saNodes[timeDir].add(node.Name);
 
     }
 
@@ -943,14 +1039,6 @@ public class MapActivity extends NMapActivity implements
             }
 
             isGuide = true;
-
-            destination = 28;  // 테스트용 목적지 임의 지정
-            int closest = cp_getClosest(location, destination); // 인접 노드 찾기
-            GMap.executeDijk(closest); // 다익스트라 생성
-            path = GMap.getPath(28/*목적지*/); // 링크드리스트 생성
-            movePath = (LinkedList<GNode>) path.clone(); // 중간 경로용 클론 생성
-            path.addFirst(new GNode(99, 32, null, null, location[0], location[1])); // 현재 위치 삽입
-            cp_TTS("안내를 시작합니다"); // 안내 시작
         }
     }
 
@@ -958,6 +1046,10 @@ public class MapActivity extends NMapActivity implements
     //////////////////////////////////////////////////////////////////////
     // 좃승호
     /////////////////////////////////////////////////////////////////////
+
+    public void getWatchComp() {
+        comp = 0;
+    }
 
     @Override
     public boolean onDown(MotionEvent e) {

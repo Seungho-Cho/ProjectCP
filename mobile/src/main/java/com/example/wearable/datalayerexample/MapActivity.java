@@ -769,7 +769,8 @@ public class MapActivity extends NMapActivity implements
                 timeDir = (dirInt + 15) / 30;
                 if (timeDir == 0)
                     timeDir = 12;
-                disInt = (int)NGeoPoint.getDistance(toNP, new NGeoPoint(next.lon, next.lat));
+                dis = NGeoPoint.getDistance(toNP, new NGeoPoint(next.lon, next.lat));
+                disInt = (int)dis;
                 tts.speak("다음 지점까지" + timeDir + "시 방향으로" + disInt + "미터");
                 //Toast.makeText(MapActivity.this, "Please enable a My Location source in system settings",
                 //        Toast.LENGTH_SHORT).show();
@@ -941,6 +942,7 @@ public class MapActivity extends NMapActivity implements
                 nodes.add(GNodes.GNodeArr[i]);
         }
 
+        tts.set_speed(TTSAdapter.MODE_SLOW);
         cp_TTS("공간지각확장을 시작합니다");
 
         for (GNode node : nodes) {
@@ -973,6 +975,7 @@ public class MapActivity extends NMapActivity implements
             dis = dis - (dis%10);
             cp_TTS((12) + "시 방향" + dis + "미터" + node.Name);
         }
+        tts.set_speed(TTSAdapter.MODE_NOMR);
 
     }
 
@@ -1364,7 +1367,7 @@ public class MapActivity extends NMapActivity implements
 
                     radText.setText("스마트워치 : " + (new Float(comp).toString()));
 
-                    if(isGuide) {
+                    if(isGuide && !isComp) {
 
                         GNode destN = movePath.peekFirst();
                         double comDir, comDif;

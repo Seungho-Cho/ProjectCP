@@ -88,6 +88,12 @@ public class SearchSelectListActivity extends ActionBarActivity
 
             mainLayout = (LinearLayout) findViewById(R.id.list_main_layout);
             tts = new TTSAdapter(this);
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addApi(Wearable.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+
             gestureDetector = new GestureDetector(this);
             intent = getIntent();
 

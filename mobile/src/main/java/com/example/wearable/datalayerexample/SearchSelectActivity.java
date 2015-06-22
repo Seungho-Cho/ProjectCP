@@ -335,7 +335,7 @@ public class SearchSelectActivity extends Activity
     // 구글 플레이 서비스에 접속 됐을 때 실행
     @Override // GoogleApiClient.ConnectionCallbacks
     public void onConnected(Bundle bundle) {
-        Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
 
         //tts.speak("스마트워치가 연결 되었습니다.");
         Wearable.MessageApi.addListener(mGoogleApiClient,this);
@@ -344,7 +344,7 @@ public class SearchSelectActivity extends Activity
     // 구글 플레이 서비스에 접속이 일시정지 됐을 때 실행
     @Override // GoogleApiClient.ConnectionCallbacks
     public void onConnectionSuspended(int i) {
-        Toast.makeText(this, "Connection Suspended", Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this, "Connection Suspended", Toast.LENGTH_SHORT).show();
     }
 
     // 구글 플레이 서비스에 접속을 실패했을 때 실행

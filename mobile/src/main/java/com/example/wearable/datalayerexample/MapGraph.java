@@ -1,6 +1,6 @@
 package com.example.wearable.datalayerexample;
 
-import com.example.wearable.datalayerexample.GNode;
+import com.nhn.android.maps.maplib.NGeoPoint;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,9 +42,10 @@ public class MapGraph {
         return true;
     }
 
-    public boolean insertEdge (int node1, int node2, int weight) {
+    public boolean insertEdge (int node1, int node2) {
         if ((VertexArr[node1] == null) || (VertexArr[node2] == null))
             return false;
+        int weight = (int) NGeoPoint.getDistance(new NGeoPoint(VertexArr[node1].lon, VertexArr[node1].lat), new NGeoPoint(VertexArr[node2].lon, VertexArr[node2].lat));
         edgeArr[node1][node2] = weight;
         edgeArr[node2][node1] = weight;
         return true;

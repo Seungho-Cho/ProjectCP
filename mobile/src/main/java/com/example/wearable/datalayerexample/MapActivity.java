@@ -125,6 +125,68 @@ public class MapActivity extends NMapActivity implements
 
     TextView lonText, latText, radText;
 
+    Thread thread = new Thread()
+    {
+        public void run()
+        {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            cp_TTS("잠시만 기다려주세요");
+            while(location[0] == 0) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            cp_TTS("시계를 들고, 화면을 길게 눌러주세요");
+            getWatchComp();
+            while(comp == -1) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            switch(mode) {
+                case MODE_NAVI:
+                    //isGuide = true;
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            guideStart();
+                        }
+                    });
+                    break;
+
+                case MODE_SA:
+                        /*
+                        switchComp();
+                        while(comp == -1) {
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        */
+                    spaceAware();
+                    break;
+
+                default:
+
+                    break;
+            }
+        }
+    };
 
 
     @Override
@@ -300,70 +362,6 @@ public class MapActivity extends NMapActivity implements
         latText = (TextView) findViewById(R.id.latText);
         radText = (TextView) findViewById(R.id.radText);
         switchGPS();
-
-        Thread thred = new Thread()
-        {
-            public void run()
-            {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                cp_TTS("잠시만 기다려주세요");
-                while(location[0] == 0) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                cp_TTS("시계를 들고, 화면을 길게 눌러주세요");
-                getWatchComp();
-                while(comp == -1) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                switch(mode) {
-                    case MODE_NAVI:
-                        //isGuide = true;
-                        mHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                guideStart();
-                            }
-                        });
-                        break;
-
-                    case MODE_SA:
-                        /*
-                        switchComp();
-                        while(comp == -1) {
-                            try {
-                                Thread.sleep(100);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        */
-                        spaceAware();
-                        break;
-
-                    default:
-
-                        break;
-                }
-            }
-        };
-        thred.start();
     }
 
 
@@ -394,7 +392,7 @@ public class MapActivity extends NMapActivity implements
     protected void onDestroy() {
         if(isComp)
             switchComp();
-        switchGPS();
+        stopMyLocation();
         mOverlayManager.clearOverlays();
         tts.destroy();
         super.onDestroy();
@@ -617,15 +615,26 @@ public class MapActivity extends NMapActivity implements
             } else {
                 boolean isMyLocationEnabled = mMapLocationManager.enableMyLocation(true);
                 if (!isMyLocationEnabled) {
-                    Toast.makeText(MapActivity.this, "GPS를 설정해주세요",
-                            Toast.LENGTH_LONG).show();
-
+                    //Toast.makeText(MapActivity.this, "GPS를 설정해주세요", Toast.LENGTH_LONG).show();
+                    tts.speak("GPS를 설정해주세요");
                     Intent goToSettings = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivity(goToSettings);
+                    startActivityForResult(goToSettings, 1);
+                    //startActivity(goToSettings);
 
                     return;
                 }
             }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        boolean isMyLocationEnabled = mMapLocationManager.enableMyLocation(true);
+        if (isMyLocationEnabled) {
+            thread.start();
+        } else {
+            finish();
         }
     }
 
@@ -1047,8 +1056,7 @@ public class MapActivity extends NMapActivity implements
         mOverlayManager.clearOverlays();
         if (isComp)
             switchComp();
-        if (mMapLocationManager.isMyLocationEnabled())
-            switchGPS();
+        stopMyLocation();
     }
 
     public void onClickPathPOI(View arg0) {

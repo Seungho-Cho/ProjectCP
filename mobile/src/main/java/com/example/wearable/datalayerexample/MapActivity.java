@@ -766,7 +766,8 @@ public class MapActivity extends NMapActivity implements
                 path = null;
                 movePath = null;
                 isGuide = false;
-                cp_TTS("목적지에 도착했습니다");
+                tts.speak("목적지에 도착했습니다");
+                tts.speak("메뉴로 돌아가시려면 위로 슬라이드 해주세요");
                 //finish();
             } else {
                 for (GNode node : path) {
@@ -782,7 +783,7 @@ public class MapActivity extends NMapActivity implements
                     timeDir = 12;
                 dis = NGeoPoint.getDistance(toNP, new NGeoPoint(next.lon, next.lat));
                 disInt = (int)dis;
-                tts.speak("다음 지점까지" + timeDir + "시 방향으로" + disInt + "미터");
+                tts.speak(timeDir + "시 방향으로" + disInt + "미터");
                 //Toast.makeText(MapActivity.this, "Please enable a My Location source in system settings",
                 //        Toast.LENGTH_SHORT).show();
                 //movePath.pollFirst();
@@ -978,16 +979,17 @@ public class MapActivity extends NMapActivity implements
             for(GNode node : saNodes[i]) {
                 int dis = (int)NGeoPoint.getDistance(locNP, new NGeoPoint(node.lon, node.lat));
                 dis = dis - (dis%10);
-                cp_TTS((i) + "시 방향" + dis + "미터" + node.Name);
+                tts.speak((i) + "시 방향" + dis + "미터" + node.Name);
             }
         }
         for(GNode node : saNodes[0]) {
             int dis = (int)NGeoPoint.getDistance(locNP, new NGeoPoint(node.lon, node.lat));
             dis = dis - (dis%10);
-            cp_TTS((12) + "시 방향" + dis + "미터" + node.Name);
+            tts.speak((12) + "시 방향" + dis + "미터" + node.Name);
         }
         tts.set_speed(TTSAdapter.MODE_NOMR);
 
+        tts.speak("메뉴로 돌아가시려면 위로 슬라이드 해주세요");
     }
 
     //각도 test

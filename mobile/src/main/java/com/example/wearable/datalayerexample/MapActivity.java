@@ -622,6 +622,8 @@ public class MapActivity extends NMapActivity implements
                     //startActivity(goToSettings);
 
                     return;
+                } else {
+                    thread.start();
                 }
             }
         }

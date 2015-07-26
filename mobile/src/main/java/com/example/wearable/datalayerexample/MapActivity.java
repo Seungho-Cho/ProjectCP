@@ -411,7 +411,7 @@ public class MapActivity extends NMapActivity implements
             } else { // fail
                 Log.e(LOG_TAG, "onFailedToInitializeWithError: " + errorInfo.toString());
 
-                Toast.makeText(MapActivity.this, errorInfo.toString(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(MapActivity.this, errorInfo.toString(), Toast.LENGTH_LONG).show();
             }
         }
 
@@ -528,13 +528,13 @@ public class MapActivity extends NMapActivity implements
             //			};
             //			runnable.run();
 
-            Toast.makeText(MapActivity.this, "Your current location is temporarily unavailable.", Toast.LENGTH_LONG).show();
+           // Toast.makeText(MapActivity.this, "Your current location is temporarily unavailable.", Toast.LENGTH_LONG).show();
         }
 
         @Override
         public void onLocationUnavailableArea(NMapLocationManager locationManager, NGeoPoint myLocation) {
 
-            Toast.makeText(MapActivity.this, "Your current location is unavailable area.", Toast.LENGTH_LONG).show();
+           // Toast.makeText(MapActivity.this, "Your current location is unavailable area.", Toast.LENGTH_LONG).show();
 
             stopMyLocation();
         }
@@ -818,7 +818,7 @@ public class MapActivity extends NMapActivity implements
             if(guideOut > 3) {
                 cp_TTS("경로를 이탈하였습니다");
             }
-            Toast.makeText(getBaseContext(), guideOut+"", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), guideOut+"", Toast.LENGTH_SHORT).show();
             return false;
         }
         else {
@@ -1261,22 +1261,22 @@ public class MapActivity extends NMapActivity implements
 
             // right to left swipe
             if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Left Swipe", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Left Swipe", Toast.LENGTH_SHORT).show();
                 swipe_left();
             }
             // left to right swipe
             else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Right Swipe", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Right Swipe", Toast.LENGTH_SHORT).show();
                 swipe_right();
             }
             // down to up swipe
             else if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Swipe up", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Swipe up", Toast.LENGTH_SHORT).show();
                 swipe_up();
             }
             // up to down swipe
             else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Swipe down", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Swipe down", Toast.LENGTH_SHORT).show();
                 swipe_down();
             }
         } catch (Exception e) {

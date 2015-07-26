@@ -1,5 +1,6 @@
 package com.example.wearable.datalayerexample;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
@@ -28,7 +29,11 @@ import java.util.Date;
 import java.util.StringTokenizer;
 
 
-public class TimeTableInputActivity extends ActionBarActivity implements TextToSpeech.OnInitListener {
+public class TimeTableInputActivity extends ActionBarActivity
+        implements TextToSpeech.OnInitListener,
+         View.OnClickListener
+{
+
 
     private Button btn;
     private EditText edit;
@@ -71,16 +76,16 @@ public class TimeTableInputActivity extends ActionBarActivity implements TextToS
 
 
 
-        btn.setOnClickListener(new View.OnClickListener() {
-            // 파라미터로 넘어오는 View는 현재 클릭된 View이다. 현재 클릭된 View는 button이다.
-            public void onClick(View v) {
-                displayCurrentTime();
-                getTimeTable();
-
-            }
-        });
+        btn.setOnClickListener(this);
         loadItems();
     }
+
+    @Override
+    public void onClick(View v) {
+        displayCurrentTime();
+        getTimeTable();
+    }
+
 
     public String displayCurrentTime(){
         long now = System.currentTimeMillis();
@@ -190,4 +195,7 @@ public class TimeTableInputActivity extends ActionBarActivity implements TextToS
     @Override
     public void onInit(int status) {
     }
+
+
+
 }

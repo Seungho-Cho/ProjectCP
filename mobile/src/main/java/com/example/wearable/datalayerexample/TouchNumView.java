@@ -40,7 +40,7 @@ public class TouchNumView extends View
     TextView output;
     EditText targetText;
     TTSAdapter tts;
-    Activity activity;
+    TimeTableInputActivity activity;
 
     Path path[] = {new Path(),new Path(),new Path(),new Path(),new Path(),new Path(),new Path(),new Path(),new Path(),new Path(),new Path(),new Path(),new Path(),new Path()};
     Dot dots[] = {new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0),new Dot(0,0)};
@@ -72,7 +72,7 @@ public class TouchNumView extends View
 
     private SendMassgeHandler mMainHandler = null;
 
-    public TouchNumView(Context context,EditText out,EditText edit,SerialHash hash,int learn,Activity activity)
+    public TouchNumView(Context context,EditText out,EditText edit,SerialHash hash,int learn,TimeTableInputActivity activity)
     {
         super(context);
         this.context = context;
@@ -290,6 +290,8 @@ public class TouchNumView extends View
         numHash.hash.put("035","9");
         numHash.hash.put("000","0");
         numHash.hash.put("0135","b");
+        numHash.hash.put("0005","o");
+        numHash.hash.put("00","o");
 
     }
     void put_hash_learn(String in,String target)
@@ -372,6 +374,10 @@ public class TouchNumView extends View
                     else if(print_msg.equals("x"))
                     {
                         activity.finish();
+                    }
+                    else if(print_msg.equals("o"))
+                    {
+                        activity.onClick(null);
                     }
                     else
                     {

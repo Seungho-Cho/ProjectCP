@@ -209,7 +209,7 @@ public class MainMenuActivity extends Activity
         public void onResult(Result result) {
             String resultString = "Sending Result : " + result.getStatus().isSuccess();
 
-            Toast.makeText(getApplication(), resultString, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplication(), resultString, Toast.LENGTH_SHORT).show();
         }
     };
 

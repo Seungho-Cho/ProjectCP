@@ -133,7 +133,7 @@ public class SearchSelectListActivity extends ActionBarActivity
             TextView nameView = (TextView)((LinearLayout)mainLayout.getChildAt(0)).getChildAt(1);
             tts.speak("처음 항목 입니다");
             tts.speak_delay((String) nameView.getText(),1000);
-
+            mainLayout.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
 
         }
 
@@ -338,7 +338,13 @@ public class SearchSelectListActivity extends ActionBarActivity
 
         if( currentResult==0 ) return;
 
-        mainLayout.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mainLayout.getChildAt(currentResult-1).setBackgroundColor(Color.GRAY);
+            }
+        });
+
 
         LinearLayout l_temp = (LinearLayout) mainLayout.getChildAt(currentResult-1);
 

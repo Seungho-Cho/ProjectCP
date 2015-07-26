@@ -367,22 +367,22 @@ public class TimeTableActivity extends ActionBarActivity
 
             // right to left swipe
             if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Left Swipe", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Left Swipe", Toast.LENGTH_SHORT).show();
                 swipe_left();
             }
             // left to right swipe
             else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Right Swipe", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Right Swipe", Toast.LENGTH_SHORT).show();
                 swipe_right();
             }
             // down to up swipe
             else if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Swipe up", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Swipe up", Toast.LENGTH_SHORT).show();
                 swipe_up();
             }
             // up to down swipe
             else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                Toast.makeText(this, "Swipe down", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Swipe down", Toast.LENGTH_SHORT).show();
                 swipe_down();
             }
         } catch (Exception e) {
@@ -513,12 +513,12 @@ public class TimeTableActivity extends ActionBarActivity
                     if (currentHour == hour) {
                         if (currentMinute <= minute) //현재 분이 강의시간 분보다 작으면
                         {
-                            Toast.makeText(TimeTableActivity.this, "다음 강의는" + className + "이고 강의 시작 시간은" + hour + "시" + minute + "분 입니다.", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(TimeTableActivity.this, "다음 강의는" + className + "이고 강의 시작 시간은" + hour + "시" + minute + "분 입니다.", Toast.LENGTH_SHORT).show();
                             check = true;
                             break;
                         }
                     } else {
-                        Toast.makeText(TimeTableActivity.this, "다음 강의는" + className + "이고 강의 시작 시간은" + hour + "시" + minute + "분 입니다.", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(TimeTableActivity.this, "다음 강의는" + className + "이고 강의 시작 시간은" + hour + "시" + minute + "분 입니다.", Toast.LENGTH_SHORT).show();
                         check = true;
                         break;
                     }
@@ -530,7 +530,7 @@ public class TimeTableActivity extends ActionBarActivity
             }
         }
         if (!check) {
-            Toast.makeText(TimeTableActivity.this, "오늘 강의는 없습니다.", Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(TimeTableActivity.this, "오늘 강의는 없습니다.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -546,7 +546,7 @@ public class TimeTableActivity extends ActionBarActivity
 //                        String str = "Android File IO Test";
 //                        fos.write(str.getBytes());
 //                        fos.close();
-            Toast.makeText(this, "table Saved Successfully", Toast.LENGTH_LONG).show();
+         //   Toast.makeText(this, "table Saved Successfully", Toast.LENGTH_LONG).show();
         } catch(Exception e) {
         }
     }
@@ -586,7 +586,7 @@ public class TimeTableActivity extends ActionBarActivity
 //                        String str = "Android File IO Test";
 //                        fos.write(str.getBytes());
 //                        fos.close();
-            Toast.makeText(this, "time_list Saved Successfully", Toast.LENGTH_LONG).show();
+           // Toast.makeText(this, "time_list Saved Successfully", Toast.LENGTH_LONG).show();
         } catch(Exception e) {
         }
     }

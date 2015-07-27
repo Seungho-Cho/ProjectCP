@@ -143,6 +143,32 @@ public class TimeTableActivity extends ActionBarActivity
         map.put(75, new TimeTable("수요일",20,00, "종합설계",54));
         map.put(45, new TimeTable("수요일",15,30, "기초 중국어",58));
         map.put(51, new TimeTable("수요일",16,30, "기초 중국어",58));
+        map.put(25, new TimeTable("월요일",12,30, "알고리즘",54));
+        map.put(31, new TimeTable("월요일",13,30, "알고리즘",54));
+        map.put(37, new TimeTable("월요일",14,30, "알고리즘",54));
+        map.put(8, new TimeTable("화요일",9,30, "영어1",28));
+        map.put(14, new TimeTable("화요일",10,30, "영어1",28));
+        map.put(20, new TimeTable("화요일",11,30, "영어1",28));
+        map.put(21, new TimeTable("수요일",11,30, "인간관계의 심리학",58));
+        map.put(27, new TimeTable("수요일",12,30, "인간관계의 심리학",58));
+        map.put(28, new TimeTable("목요일",12,30, "일반물리학1",37));
+        map.put(34, new TimeTable("목요일",13,30, "일반물리학1",37));
+        map.put(40, new TimeTable("목요일",14,30, "일반물리학1",37));
+        map.put(29, new TimeTable("금요일",12,30, "수학1",54));
+        map.put(35, new TimeTable("금요일",13,30, "수학1",54));
+        map.put(41, new TimeTable("금요일",14,30, "수학1",54));
+        map.put(47, new TimeTable("금요일",15,30, "수학1",54));
+        map.put(53, new TimeTable("금요일",16,30, "이산수학",54));
+        map.put(59, new TimeTable("금요일",17,25, "이산수학",54));
+        map.put(65, new TimeTable("금요일",18,15, "이산수학",54));
+        map.put(71, new TimeTable("금요일",19,05, "공업수학1",54));
+        map.put(77, new TimeTable("금요일",20,00, "공업수학1",54));
+        map.put(83, new TimeTable("금요일",20,50, "공업수학1",54));
+        map.put(89, new TimeTable("금요일",21,40, "공업수학1",54));
+        map.put(55, new TimeTable("월요일",17,25, "한국근현대사",58));
+        map.put(61, new TimeTable("월요일",18,15, "한국근현대사",58));
+        map.put(44, new TimeTable("화요일",15,30, "한국근현대사",58));
+
 
         Day.put(1,"월요일");
         Day.put(2,"화요일");

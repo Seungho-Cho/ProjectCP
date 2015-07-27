@@ -15,7 +15,7 @@
         android:layout_below="@+id/y_editText"
         android:layout_alignParentStart="true"
         android:layout_alignEnd="@+id/y_editText"
-        android:visibility="gone"/>
+        android:visibility="visible"/>
 
     <EditText
         android:layout_width="match_parent"
